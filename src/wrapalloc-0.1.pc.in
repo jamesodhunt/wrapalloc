@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: WrapAlloc
+Description: Memory allocation debugging library
+Version: @VERSION@
+Libs: -L${libdir} -lwrapalloc-0.1
+Cflags: -I${includedir}/wrapalloc-0.1

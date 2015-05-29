@@ -1,0 +1,231 @@
+.TH WRAPALLOC "3" "2015-05-14" "Library Calls"
+.\" -----------------------------------------------------------------
+.SH NAME
+wrapalloc \- memory checking library.
+.\" Macros
+.de Vb \" Begin verbatim text
+.ft CW
+.nf
+.ne \\$1
+..
+.de Ve \" End verbatim text
+.ft R
+.fi
+..
+.\" -----------------------------------------------------------------
+.SH SYNOPSIS
+Link with \fI\-lwrapalloc\fP.
+
+[\fIOPTION\fR]
+.\" -----------------------------------------------------------------
+.SH DESCRIPTION
+FIXME.
+.\" -----------------------------------------------------------------
+.SH USAGE
+
+.IP \(bu 4
+Link your program with \fI\-lwrapalloc\fP.
+.IP \(bu 4
+Or link your program with \fIlibwrapalloc.a\fP.
+.IP \(bu 4
+Or set "\fBLD\_PRELOAD=\fI/full/path/to/libwrapalloc.so\fR" in the
+environment where the program will be executed.
+
+.\" -----------------------------------------------------------------
+.SH ENVIRONMENT VARIABLES
+.\"
+The behaviour of the library is controlled entirely by environment
+variables:
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_DEBUG
+Set to an integer value of
+.B 1
+or higher to enable debug output of increasing verbosity.
+
+Default: not set.
+.PP
+
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_BORDER
+Size of both pre-border and post-border buffers (in bytes) that are allocated
+before and after respectively the requested memory.
+
+Default: system page size.
+.PP
+
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_PRE\_BORDER
+Size of pre-border buffer (in bytes) that is allocated before the
+requested memory.
+
+If set, this takes priority over \fIWRAP\_ALLOC\_BORDER\fP.
+
+Default: value of \fIWRAP\_ALLOC\_BORDER\fP.
+.PP
+
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_POST\_BORDER
+Size of pre-border buffer (in bytes) that is allocated after the
+requested memory.
+
+If set, this takes priority over \fIWRAP\_ALLOC\_BORDER\fP.
+
+Default: Value of \fIWRAP\_ALLOC\_BORDER\fP.
+.PP
+
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_FILL
+Byte used to fill both the pre-border and post-border buffers.
+
+Default: 0x0.
+.PP
+
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_PRE\_FILL
+Byte used to fill the pre-border buffer.
+
+Default: value of \fBWRAP\_ALLOC\_FILL\fR.
+.PP
+
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_POST\_FILL
+Byte used to fill the post-border buffer.
+
+Default: value of \fBWRAP\_ALLOC\_FILL\fR.
+.PP
+
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_ALLOC\_BYTE
+Byte used to fill newly-allocated space before it is returned to the
+caller.
+
+Default: 0x0.
+.PP
+
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_FREE\_BYTE
+Byte used to fill allocated space just before the memory is passed to
+.BR free (3) "" .
+
+Default: 0x0.
+.PP
+
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_DISABLE\_FREE
+If set to any value,
+.BR free (3)
+will never be called. Useful when used in combination with
+.BR WRAP\_ALLOC\_FREE\_BYTE .
+
+Default: not set.
+.PP
+
+.\" -----------------------------------------------------------------
+.RS
+.B WRAP\_ALLOC\_SEGV\_ACTION
+Controls the behaviour should an error be detected. Takes one of the
+following forms:
+.RS
+.IP \(bu 4
+exit:\fInumber\fR
+
+Call
+.BR exit (3)
+with the specified value.
+.IP \(bu 4
+sleep:\fInumber\fR
+
+Call
+.BR sleep (3)
+with the specified value.
+.IP \(bu 4
+signal:\fInumber\fR
+
+Calls 
+.BR raise (3)
+specifying the signal number as
+.BR number .
+.IP \(bu 4
+signal:\fIname\fR
+
+Calls 
+.BR raise (3)
+passing the signal number as the value corresponding to
+.BR name .
+.IP \(bu 4
+\fBabort\fR
+
+Calls
+.BR abort (3) "" .
+.RE
+
+Default: Calls abort(3).
+.RE
+
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_LOGFILE
+Full path to log file that will be created.
+
+Default: Not set - log data will be written to stderr.
+
+.\" -----------------------------------------------------------------
+.SH NOTES
+
+FIXME.
+
+.\" -----------------------------------------------------------------
+.SH LIMITATIONS
+
+FIXME.
+.\" -----------------------------------------------------------------
+.SH AUTHORS
+
+Written by
+James Hunt
+.RB < james.hunt@ubuntu.com > "" .
+.\" -----------------------------------------------------------------
+.SH COPYRIGHT
+
+Copyright (\(co) 2015 James Hunt
+.RB < james.hunt@ubuntu.com > "" .
+.br
+This is free software; see the source for copying conditions.  There is
+NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.
+.\" -----------------------------------------------------------------
+.SH LICENSE
+GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+.\" -----------------------------------------------------------------
+.SH SEE ALSO
+
+.BR alloca (3) "" ,
+.BR calloc (3) "" ,
+.BR cc (1) "" ,
+.BR dmalloc (1) "" ,
+.BR efence (3) "" ,
+.BR exit (3) "" ,
+.BR free (3) "" ,
+.BR getpagesize (2) "" ,
+.BR ld.so (8) "" ,
+.BR malloc (3) "" ,
+.BR mallopt (3)
+.BR raise (3)
+.BR realloc (3) "" ,
+.BR sleep (3) "" .
+
+.\" -----------------------------------------------------------------

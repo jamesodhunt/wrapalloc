@@ -1,0 +1,45 @@
+#---------------------------------------------------------------------
+# ~/.gitignore-autotools.
+#
+# This ignores all the autotools (automake, autoconf, configure,
+# libtools, pkg-config) auto-generated crud.
+#
+# Copy into your newly-created git repo as ./.gitignore.
+#---------------------------------------------------------------------
+
+/autom4te.cache/
+/config/
+Makefile
+Makefile.in
+aclocal.m4
+app.info
+compile
+config.h
+config.h.in
+config.log
+config.status
+configure
+configure.scan
+coverage_report
+depcomp
+install-sh
+libtool
+m4
+missing
+stamp-h1
+*~
+*.html
+*.log
+*.o
+*.la
+*.so*
+*.a
+.deps
+*.tar*
+*.zip
+*.lo
+*.gcno
+*.gcda
+core.*
+
+#---------------------------------------------------------------------
