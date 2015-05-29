@@ -11,20 +11,20 @@ Overview
 wrapalloc is a tool that intercepts calls to the libc memory
 management routines. This allows it:
 
- * perform checks on:
+- perform checks on:
 
-   * *overruns*
-     (where the calling program writes beyond the end of the memory it
-     has allocated).
+  - *overruns*
+    (where the calling program writes beyond the end of the memory it
+    has allocated).
 
-   * *underruns*
-     (where the calling program writes before the start of
-     the memory it has allocated).
+  - *underruns*
+    (where the calling program writes before the start of
+    the memory it has allocated).
 
- * display memory management statistics.
- * arrange for memory to be initialised with a particular bit pattern.
- * arrange for memory to be returned to the system after first
-   overwriting it with a particular bit pattern.
+- display memory management statistics.
+- arrange for memory to be initialised with a particular bit pattern.
+- arrange for memory to be returned to the system after first
+  overwriting it with a particular bit pattern.
 
 wrapalloc is similar to ``dmalloc(1)`` and ``electric-fence(efence(3))``,
 but it's lighter-weight (and less clever).
@@ -96,9 +96,9 @@ variables to control the behaviour of this library.
 Limitations
 -----------
 
-* Won't work correctly for threaded apps (due to simplistic setting of 'caller').
+- Won't work correctly for threaded apps (due to simplistic setting of 'caller').
 
-* Although the code handles it, the library cannot be built to use the
+- Although the code handles it, the library cannot be built to use the
   dynamic linker rather than the linker trick since the dynamic linker
   routines allocate memory, resulting in recursive execution followed
   by a crash.
