@@ -41,7 +41,7 @@ When the user allocates a block of memory like this::
      +---------+------------+--------+-------------+
      | MCB     | pre-buffer | memory | post-buffer |
      +---------+------------+--------+-------------+
-      'memory'              0 ..... 16
+      'memory'              0 ..... 15
          |                  ^
          |                  |
          +------------------^
