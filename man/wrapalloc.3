@@ -38,12 +38,11 @@ The behaviour of the library is controlled entirely by environment
 variables:
 .\" -----------------------------------------------------------------
 .TP
-.B WRAP\_ALLOC\_DEBUG
-Set to an integer value of
-.B 1
-or higher to enable debug output of increasing verbosity.
+.B WRAP\_ALLOC\_ALLOC\_BYTE
+Byte used to fill newly-allocated space before it is returned to the
+caller.
 
-Default: not set.
+Default: 0x0.
 .PP
 
 .\" -----------------------------------------------------------------
@@ -57,15 +56,43 @@ Default: system page size.
 
 .\" -----------------------------------------------------------------
 .TP
-.B WRAP\_ALLOC\_PRE\_BORDER
-Size of pre-border buffer (in bytes) that is allocated before the
-requested memory.
+.B WRAP\_ALLOC\_DEBUG
+Set to an integer value of
+.B 1
+or higher to enable debug output of increasing verbosity.
 
-If set, this takes priority over \fIWRAP\_ALLOC\_BORDER\fP.
-
-Default: value of \fIWRAP\_ALLOC\_BORDER\fP.
+Default: not set.
 .PP
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_DISABLE\_FREE
+If set to any value,
+.BR free (3)
+will never be called. Useful when used in combination with
+.BR WRAP\_ALLOC\_FREE\_BYTE .
 
+Default: not set.
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_FILL
+Byte used to fill both the pre-border and post-border buffers.
+
+Default: 0x0.
+.PP
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_FREE\_BYTE
+Byte used to fill allocated space just before the memory is passed to
+.BR free (3) "" .
+
+Default: 0x0.
+.PP
+.\" -----------------------------------------------------------------
+.TP
+.B WRAP\_ALLOC\_LOGFILE
+Full path to log file that will be created.
+
+Default: None - \fBmust\fR be set for reliable output.
 .\" -----------------------------------------------------------------
 .TP
 .B WRAP\_ALLOC\_POST\_BORDER
@@ -76,23 +103,16 @@ If set, this takes priority over \fIWRAP\_ALLOC\_BORDER\fP.
 
 Default: Value of \fIWRAP\_ALLOC\_BORDER\fP.
 .PP
-
 .\" -----------------------------------------------------------------
 .TP
-.B WRAP\_ALLOC\_FILL
-Byte used to fill both the pre-border and post-border buffers.
+.B WRAP\_ALLOC\_PRE\_BORDER
+Size of pre-border buffer (in bytes) that is allocated before the
+requested memory.
 
-Default: 0x0.
+If set, this takes priority over \fIWRAP\_ALLOC\_BORDER\fP.
+
+Default: value of \fIWRAP\_ALLOC\_BORDER\fP.
 .PP
-
-.\" -----------------------------------------------------------------
-.TP
-.B WRAP\_ALLOC\_PRE\_FILL
-Byte used to fill the pre-border buffer.
-
-Default: value of \fBWRAP\_ALLOC\_FILL\fR.
-.PP
-
 .\" -----------------------------------------------------------------
 .TP
 .B WRAP\_ALLOC\_POST\_FILL
@@ -100,38 +120,14 @@ Byte used to fill the post-border buffer.
 
 Default: value of \fBWRAP\_ALLOC\_FILL\fR.
 .PP
-
 .\" -----------------------------------------------------------------
 .TP
-.B WRAP\_ALLOC\_ALLOC\_BYTE
-Byte used to fill newly-allocated space before it is returned to the
-caller.
+.B WRAP\_ALLOC\_PRE\_FILL
+Byte used to fill the pre-border buffer.
 
-Default: 0x0.
-.PP
-
+Default: value of \fBWRAP\_ALLOC\_FILL\fR.
 .\" -----------------------------------------------------------------
 .TP
-.B WRAP\_ALLOC\_FREE\_BYTE
-Byte used to fill allocated space just before the memory is passed to
-.BR free (3) "" .
-
-Default: 0x0.
-.PP
-
-.\" -----------------------------------------------------------------
-.TP
-.B WRAP\_ALLOC\_DISABLE\_FREE
-If set to any value,
-.BR free (3)
-will never be called. Useful when used in combination with
-.BR WRAP\_ALLOC\_FREE\_BYTE .
-
-Default: not set.
-.PP
-
-.\" -----------------------------------------------------------------
-.RS
 .B WRAP\_ALLOC\_SEGV\_ACTION
 Controls the behaviour should an error be detected. Takes one of the
 following forms:
@@ -167,17 +163,9 @@ passing the signal number as the value corresponding to
 
 Calls
 .BR abort (3) "" .
-.RE
-
+.PP
 Default: Calls abort(3).
 .RE
-
-.\" -----------------------------------------------------------------
-.TP
-.B WRAP\_ALLOC\_LOGFILE
-Full path to log file that will be created.
-
-Default: Not set - log data will be written to stderr.
 
 .\" -----------------------------------------------------------------
 .SH NOTES
