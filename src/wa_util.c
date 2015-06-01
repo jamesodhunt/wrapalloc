@@ -158,15 +158,25 @@ _wa_log_msg (const char *file,
     }
 
     logfile = getenv (WRAP_ALLOC_LOGFILE_ENV);
-    if (logfile) {
-        fd = open (logfile, (O_CREAT|O_APPEND|O_WRONLY), 0640);
-        if (fd < 0) {
-            goto err_open_logfile;
-        }
+
+    if (! logfile) {
+        /* No logfile specified, so unable to continue. We require a
+         * logfile since at unload time (when wa_finish() gets called),
+         * the _CALLER_ *may* have closed stdout/stderr, so we cannot
+         * reliably use it. We could re-open, but that's horrid.
+         */
+        return;
+    }
+
+    fd = open (logfile, (O_CREAT|O_APPEND|O_WRONLY), 0640);
+    if (fd < 0) {
+        goto err_open_logfile;
     }
 
     if (wa_debug_value > 1) {
-        ret = sprintf (p, "%s:pid=%d:ppid=%d:file=%s:line=%d:func=%s:",
+        ret = snprintf (p,
+                sizeof (buffer)-len,
+                "%s:pid=%d:ppid=%d:file=%s:line=%d:func=%s:",
                 APP_NAME, pid, ppid, file, line, func);
         if (ret < 0)
             goto err;
@@ -176,45 +186,64 @@ _wa_log_msg (const char *file,
 
     va_start (ap, fmt);
 
-    ret = vsnprintf (p, WA_LOG_BUFSIZE-len, fmt, ap);
+    ret = vsnprintf (p,
+            sizeof (buffer)-len,
+            fmt, ap);
     if (ret < 0)
         goto err;
     len += ret;
 
     va_end (ap);
 
-    strcat (buffer, "\n");
+    assert (len < sizeof (buffer));
 
-    if (write (fd, buffer, len) < 0)
+    if (write (fd, buffer, len) < 0) {
+        if (errno == EBADF) {
+            /* the caller closed stderr */
+            return;
+        }
         goto oh_dear;
+    }
 
-    if (fd != STDERR_FILENO)
-        close (fd);
+    close (fd);
 
     return;
 
 err:
-    /* we're getting REALLY desperate now! */
-    len = sprintf (buffer,
+    len = 0;
+    len = snprintf (buffer,
+            sizeof (buffer)-len,
             "ERROR: pid=%d, ppid=%d:file=%s:line=%d:func=%s: "
             "failed to prepare buffer (fmt=\"%s\")\n",
             pid, ppid, file, line, func,
             fmt);
 
-    if (write (STDERR_FILENO, buffer, len) < 0)
+    if (write (STDERR_FILENO, buffer, len) < 0) {
+        if (errno == EBADF) {
+            /* the caller closed stderr */
+            return;
+        }
         goto oh_dear;
+    }
 
     abort ();
 
 err_open_logfile:
-    len = sprintf (buffer,
+    len = 0;
+    len = snprintf (buffer,
+            sizeof (buffer)-len,
             "ERROR: pid=%d, ppid=%d:file=%s:line=%d:func=%s: "
             "failed to open logfile %s (errno=%d [%s])\n",
             pid, ppid, file, line, func,
             logfile, errno, strerror (errno));
 
-    if (write (STDERR_FILENO, buffer, len) < 0)
+    if (write (STDERR_FILENO, buffer, len) < 0) {
+        if (errno == EBADF) {
+            /* the caller closed stderr */
+            return;
+        }
         goto oh_dear;
+    }
 
     abort ();
 

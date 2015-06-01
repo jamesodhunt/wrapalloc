@@ -138,6 +138,8 @@ extern void *__real_alloca (size_t size);
 #define WA_BUFSIZE              1024
 #define WA_LOG_BUFSIZE         WA_BUFSIZE
 
+#define WA_DEFAULT_BUFFER_SIZE 4096
+
 /* Behave like calloc(3) by default */
 #ifndef DEFAULT_FILL_BYTE
   #define DEFAULT_FILL_BYTE  0x0

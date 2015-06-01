@@ -146,8 +146,6 @@ struct wa_segv_action_details
     long int            value;
 };
 
-static time_t wa_rate_limit_prev_time;
-
 static struct statistics {
     size_t malloc_calls;
     size_t calloc_calls;

@@ -84,8 +84,8 @@ static void wa_abort (void);
 static int wa_rate_limit (size_t secs)
     __attribute__ ((unused));
 
-static long int
-wa_get_number (const char *number);
+static bool
+wa_get_number (const char *number, long int *value);
 
 void *
 __attribute ((no_instrument_function))
@@ -122,28 +122,12 @@ __attribute ((no_instrument_function))
 #endif
 
 static void
-__attribute__ ((no_instrument_function))
-wa_init (void);
-
-static void
-__attribute__ ((no_instrument_function))
-wa_finish (void);
-
-static void
 __attribute__ ((constructor, no_instrument_function))
-malloc_init (void);
-
-static void
-__attribute__ ((constructor, no_instrument_function))
-    malloc_init (void);
-
-static void
-__attribute__ ((no_instrument_function))
     wa_init (void);
 
 static void
-__attribute__ ((destructor, no_instrument_function))
-malloc_finish (void);
+__attribute__ ((/*destructor*/, no_instrument_function))
+    wa_finish (void);
 
 /********************************************************************/
 /* functions */
@@ -185,7 +169,9 @@ alloca (size_t size)
 /*
  * wa_get_number:
  *
- * Convert a string representation of a number and return the value.
+ * Convert a string representation of a number.
+ *
+ * Returns: TRUE on success, else FALSE.
  *
  * Accepts numbers in:
  *
@@ -193,10 +179,11 @@ alloca (size_t size)
  * - hex.
  * - octal.
  */
-static long int
-wa_get_number (const char *number)
+static bool
+wa_get_number (const char *number, long int *value)
 {
     const char  *p = number;
+    char        *endptr;
     int          base = 10;
 
     wa_assert (number);
@@ -212,7 +199,13 @@ wa_get_number (const char *number)
     /* Don't bother with error checking since the value
      * returned on error is usable.
      */
-    return strtol (p, NULL, base);
+    errno = 0;
+    *value = strtol (p, &endptr, base);
+    if (errno || *endptr) {
+        return FALSE;
+    }
+
+    return TRUE;
 }
 
 /**
@@ -227,8 +220,10 @@ wa_get_number (const char *number)
 WA_PRIVATE unsigned char
 wa_get_fill_byte (enum wa_buffer_type buffer_type)
 {
-    char *specific;
-    char *default_fill;
+    char     *specific;
+    char     *default_fill;
+    char     *use;
+    long int  value = 0;
 
     default_fill = getenv (WRAP_ALLOC_FILL_ENV);
 
@@ -236,11 +231,20 @@ wa_get_fill_byte (enum wa_buffer_type buffer_type)
             ? WRAP_ALLOC_PRE_FILL_ENV
             : WRAP_ALLOC_POST_FILL_ENV);
 
-    return specific
-        ? wa_get_number (specific)
-        : default_fill
-        ? wa_get_number (default_fill)
-        : DEFAULT_FILL_BYTE;
+    use = specific ? specific : default_fill;
+
+    if (use) {
+        if (! wa_get_number (use, &value) || value < 0)
+            goto out;
+
+        if (value < CHAR_MIN || value > UCHAR_MAX)
+            goto out;
+
+        return (char)value;
+    }
+
+out:
+    return DEFAULT_FILL_BYTE;
 }
 
 /**
@@ -255,13 +259,17 @@ wa_get_alloc_fill_byte (void)
     char    *p;
     long int value;
 
-    if ((p=getenv (WRAP_ALLOC_ALLOC_BYTE_ENV)))
-    {
-        value = wa_get_number (p);
-        if (value <= UCHAR_MAX)
-            return (unsigned char)value;
+    if ((p=getenv (WRAP_ALLOC_ALLOC_BYTE_ENV))) {
+        if (wa_get_number (p, &value)
+                && value >= CHAR_MIN 
+                && value <= UCHAR_MAX) {
+            return value;
+        } else {
+            goto out;
+        }
     }
 
+out:
     return (unsigned char)DEFAULT_ALLOC_FILL_BYTE;
 }
 
@@ -277,13 +285,17 @@ wa_get_free_fill_byte (void)
     char     *p;
     long int  value;
 
-    if ((p=getenv (WRAP_ALLOC_FREE_BYTE_ENV)))
-    {
-        value = wa_get_number (p);
-        if (value <= UCHAR_MAX)
-            return (unsigned char)value; 
+    if ((p=getenv (WRAP_ALLOC_FREE_BYTE_ENV))) {
+        if (wa_get_number (p, &value)
+                && value >= CHAR_MIN 
+                && value <= UCHAR_MAX) {
+            return value;
+        } else {
+            goto out;
+        }
     }
 
+out:
     return (unsigned char)DEFAULT_FREE_FILL_BYTE;
 }
 
@@ -310,13 +322,22 @@ wa_get_border_size (enum wa_buffer_type buffer_type)
     if (! p)
         p = getenv (WRAP_ALLOC_BORDER_ENV);
 
-    if (! p)
-        return getpagesize ();
+    if (p && *p) {
+        char *endptr;
 
-    value = atol (p);
-    wa_assert (value <= ULONG_MAX);
+        errno = 0;
+        value = strtol (p, &endptr, 10);
+        if (errno || *endptr) {
+            return WA_DEFAULT_BUFFER_SIZE;
+        } else {
+            goto out;
+        }
+    }
 
-    return value;
+    value = sysconf(_SC_PAGESIZE);
+
+out:
+    return value > 0 ? value : WA_DEFAULT_BUFFER_SIZE;
 }
 
 /**
@@ -328,14 +349,13 @@ wa_get_border_size (enum wa_buffer_type buffer_type)
 WA_PRIVATE void
 wa_get_segv_action (void)
 {
-    char *e;
-    char *p;
-    char signal_tag[] = "signal:";
-    char exit_tag[] = "exit:";
-    char sleep_tag[] = "sleep:";
-    char crash_tag[] = "abort";
-
-    int default_signal = SIGABRT;
+    char   *e;
+    char   *p;
+    char    signal_tag[] = "signal:";
+    char    exit_tag[] = "exit:";
+    char    sleep_tag[] = "sleep:";
+    char    crash_tag[] = "abort";
+    int     default_signal = SIGABRT;
 
     e = getenv (WRAP_ALLOC_SEGV_ACTION_ENV);
     if (! e || ! *e)
@@ -345,10 +365,12 @@ wa_get_segv_action (void)
         wa_segv_details.action = WA_SEGV_RAISE_SIGNAL;
 
         p = e + strlen (signal_tag);
-        if (p) {
+        if (p && *p) {
             if (isdigit (*p)) {
                 /* numeric signal number */
-                wa_segv_details.value = wa_get_number (p);
+                if (! wa_get_number (p, &wa_segv_details.value)
+                        || wa_segv_details.value < 0)
+                    wa_segv_details.value = default_signal;
             } else {
                 /* symbolic signal name */
                 wa_segv_details.value = wa_signal_name_to_num(p);
@@ -369,9 +391,10 @@ wa_get_segv_action (void)
         wa_segv_details.action = WA_SEGV_EXIT;
 
         p = e + strlen (exit_tag);
-        if (p) {
-            wa_segv_details.value = wa_get_number (p);
-            if (wa_segv_details.value > 255)
+        if (p && *p) {
+            if (! wa_get_number (p, &wa_segv_details.value)
+                    || wa_segv_details.value < 0
+                    || wa_segv_details.value > 255)
                 wa_segv_details.value = 255;
         } else {
             wa_segv_details.value = EXIT_FAILURE;
@@ -380,8 +403,11 @@ wa_get_segv_action (void)
         wa_segv_details.action = WA_SEGV_SLEEP_AND_ABORT;
 
         p = e + strlen (sleep_tag);
-        if (p)
-            wa_segv_details.value = wa_get_number (p);
+        if (p && *p) {
+            if (! wa_get_number (p, &wa_segv_details.value)
+                    || wa_segv_details.value < 0)
+                wa_segv_details.value = 0;
+        }
     } else if (! strcmp (e, crash_tag)) {
         wa_segv_details.action = WA_SEGV_ABORT;
     }
@@ -981,7 +1007,6 @@ wa_address_list_init (void)
     wa_assert (wa_address_list);
 }
 
-// FIXME: remove the getenv() calls - they are made too early!!
 /**
  * wa_init:
  *
@@ -989,7 +1014,7 @@ wa_address_list_init (void)
  *
  **/
 static void
-__attribute__ ((no_instrument_function))
+__attribute__ ((constructor, no_instrument_function))
 wa_init (void)
 {
     char     *p;
@@ -1001,8 +1026,9 @@ wa_init (void)
     wa_mcb_list_init ();
 
     if ((p=getenv (WRAP_ALLOC_DEBUG_ENV))) {
-        value = wa_get_number (p);
-        if (value <= UCHAR_MAX)
+        if (wa_get_number (p, &value)
+                && value >= CHAR_MIN 
+                && value <= UCHAR_MAX)
             wa_debug_value = value;
     }
 
@@ -1128,6 +1154,7 @@ wa_init (void)
     /* We'd like to just rely on malloc_finish(), but that doesn't work
      * for the LD_PRELOAD scenario.
      */
+    // FIXME
     atexit (wa_finish);
 
     if (getenv (WRAP_ALLOC_SIGSEGV_HANDLER_ENV))
@@ -1137,39 +1164,11 @@ wa_init (void)
 }
 
 static void
-__attribute__ ((no_instrument_function))
+__attribute__ ((/*destructor*/, no_instrument_function))
 wa_finish (void)
 {
     wa_show_stats ();
     wa_show_unfreed ();
-}
-
-/**
- * malloc_init:
- *
- * Called automatically first time application attempts to allocate
- * any memory.
- **/
-static void
-__attribute__ ((constructor, no_instrument_function))
-malloc_init (void)
-{
-    wa_init ();
-}
-
-/**
- * malloc_finish:
- *
- * Alternative to atexit(3).
- *
- * XXX: Note that this will seemingly *only* get called *iff* the
- * XXX: application you're linking to actually calls a memory
- * XXX: management routine!
- **/
-static void
-__attribute__ ((destructor, no_instrument_function))
-malloc_finish (void)
-{
 }
 
 /**
@@ -1185,6 +1184,10 @@ static int
 wa_rate_limit (size_t secs)
 {
     static int initialized = 0;
+
+    /* Used to hold the time this function was last called */
+    static time_t wa_rate_limit_prev_time = 0;
+
     time_t now;
 
     if (! initialized) {
@@ -1280,12 +1283,12 @@ wa_setup_signals (void)
     }
 
     if (wa_debug_value > 1)
-      wa_debug ("registered SIGSEGV handler\n");
+        wa_debug ("registered SIGSEGV handler\n");
 
     /* Save callers handler */
     if (handler &&
-        handler != wa_signal_handler &&
-        handler != wa_orig_sigsegv_handler)
+            handler != wa_signal_handler &&
+            handler != wa_orig_sigsegv_handler)
         /* FIXME: not used */
         wa_orig_sigsegv_handler = handler;
 }
@@ -1300,38 +1303,38 @@ wa_abort (void)
 
     switch (wa_segv_details.action) {
 
-        case WA_SEGV_RAISE_SIGNAL:
-            wa_msg ("caught SIGSEGV - raising signal %d (%s)\n",
-                    (int)wa_segv_details.value,
-                    wa_signal_num_to_name (wa_segv_details.value));
-            fflush (NULL);
+    case WA_SEGV_RAISE_SIGNAL:
+        wa_msg ("caught SIGSEGV - raising signal %d (%s)\n",
+                (int)wa_segv_details.value,
+                wa_signal_num_to_name (wa_segv_details.value));
+        fflush (NULL);
 
-            raise (wa_segv_details.value);
-            break;
+        raise (wa_segv_details.value);
+        break;
 
-        case WA_SEGV_EXIT:
-            wa_msg ("caught SIGSEGV - exiting with value %d\n",
-                    (int)wa_segv_details.value);
-            fflush (NULL);
+    case WA_SEGV_EXIT:
+        wa_msg ("caught SIGSEGV - exiting with value %d\n",
+                (int)wa_segv_details.value);
+        fflush (NULL);
 
-            exit (wa_segv_details.value);
-            break;
+        exit (wa_segv_details.value);
+        break;
 
-        case WA_SEGV_SLEEP_AND_ABORT:
-            wa_msg ("caught SIGSEGV - sleeping for %d seconds before aborting\n",
-                    (int)wa_segv_details.value);
-            fflush (NULL);
+    case WA_SEGV_SLEEP_AND_ABORT:
+        wa_msg ("caught SIGSEGV - sleeping for %d seconds before aborting\n",
+                (int)wa_segv_details.value);
+        fflush (NULL);
 
-            sleep (wa_segv_details.value);
+        sleep (wa_segv_details.value);
 
-            abort ();
-            break;
+        abort ();
+        break;
 
-        default:
-            wa_msg ("caught SIGSEGV - aborting\n");
-            fflush (NULL);
+    default:
+        wa_msg ("caught SIGSEGV - aborting\n");
+        fflush (NULL);
 
-            abort ();
-            break;
+        abort ();
+        break;
     }
 }
