@@ -2,9 +2,10 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([wrap_alloc], [0.1], [james.hunt@ubuntu.com])
+AC_INIT([wrapalloc], [0.1], [james.hunt@ubuntu.com])
 AC_CONFIG_FILES([Makefile
                  src/Makefile
+                 src/Makefile.am
                  src/wrapalloc-0.1.pc
                  tests/Makefile
                  ])
