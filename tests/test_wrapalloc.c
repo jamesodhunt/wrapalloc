@@ -37,25 +37,30 @@ char *program_name;
 void
 test_wrapalloc (const char *action)
 {
-    char *string;
+    char   *string = WORD;
+    size_t  len;
 
     assert (action);
 
-    if ((string = (char *)malloc (strlen (WORD)+1)) == NULL) {
+    len = strlen (string);
+
+    string = (char *)malloc (len+1);
+
+    if (! string) {
         fprintf (stderr,
                 "%s:%d: malloc failed - errno=%d\n",
                 __func__, __LINE__, errno);
         exit (EXIT_FAILURE);
     }
 
-    strncpy (string, WORD, strlen (WORD)+1);
+    strncpy (string, WORD, len+1);
 
     if (! strcmp (action, "underrun")) {
         fprintf (stderr, "forcing an underrun\n");
         *(string-1) = 'U';
     } else if (! strcmp (action, "overrun")) { 
         fprintf (stderr, "forcing an overrun\n");
-        *(string + strlen (string)+1) = 'O';
+        *(string + len+1) = 'O';
     } else {
         fprintf (stderr, "No under/over-run requested\n");
     }
