@@ -200,11 +200,12 @@ _wa_log_msg (const char *file,
     if (write (fd, buffer, len) < 0) {
         if (errno == EBADF) {
             /* the caller closed stderr */
-            return;
+            goto out;
         }
         goto oh_dear;
     }
 
+out:
     close (fd);
 
     return;
