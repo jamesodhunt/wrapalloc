@@ -32,7 +32,7 @@ but it's lighter-weight (and less clever).
 Design
 ------
 
-When the user allocates a block of memory like this::
+When the user allocates a block of say 16 bytes of memory like this::
 
     char *p = malloc (16);
 
@@ -41,21 +41,40 @@ When the user allocates a block of memory like this::
      +---------+------------+--------+-------------+
      | MCB     | pre-buffer | memory | post-buffer |
      +---------+------------+--------+-------------+
-      'memory'              0 ..... 15
-         |                  ^
-         |                  |
-         +------------------^
-                            |
-                            p
+      .memory               0 ..... 15            
+         |     ^            ^                      ^
+         |     |            |                      |
+         +-----|------------^                      |
+               |            |                      |
+      .begin --+            p                      |
+                                                   |
+      .end ----------------------------------------+
+
+      .request_size ------->{________}
+
+      .total_size
+          |
+     +----+
+     V
+     {_____________________________________________}
+
 
 The user is returned the address of a block of the size they specified.
 However, we also allocate a pre- and post- buffer or "margin" either
 side and immediately adjacent to the chunk of space requested.
 
-Immediately before the pre-buffer is the MCB or MemoryCtlBlock, a
-control block used for recording information about the allocation and
-buffers/margins. The MCB has a 'memory' element that points at the
-address returned to the user.
+Immediately before the pre-buffer is the MCB or "``MemoryCtlBlock``", a
+structure used for recording information about the allocation and
+buffers/margins. The MCB has a number of elements useful for tracking
+the original allocation including:
+
+- ``.memory`` which points to the memory block returned to the user.
+- ``.begin`` which points to the start of the pre-buffer.
+- ``.end`` which points to the end of the post-buffer.
+- ``.request_size`` which records the size of the block of memory the
+  user requested.
+- ``.total_size`` which records the actual amount of memory allocated
+  (requested size + pre-buffer size + post-buffer size + MCB).
 
 If the program either overruns or underruns such that either the pre- or
 post-buffers get modified, this is detected both when ``realloc(3)`` is
