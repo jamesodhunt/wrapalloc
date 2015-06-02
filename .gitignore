@@ -41,5 +41,11 @@ stamp-h1
 *.gcno
 *.gcda
 core.*
+GPATH
+GRTAGS
+GTAGS
+cscope.files
+cscope.in.out
+cscope.po.out
 
 #---------------------------------------------------------------------

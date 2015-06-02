@@ -530,6 +530,7 @@ wa_check_ctl_block (const MemoryCtlBlock *m)
 
     /* Check for caller underruns */
     p = wa_mcb_to_pre_border (m);
+    wa_assert (p);
 
     for (count = 0; count < pre_border; count++, p++) {
         if (*p != fill_byte) {
@@ -1079,8 +1080,10 @@ wa_init (void)
     wa_debug ("  __wa_wrap_free=%p\n", __wa_wrap_free);
     wa_debug ("  __real_free=%p\n", __real_free);
 
+#ifdef USE_INSTRUMENT
     wa_debug ("  __cyg_profile_func_enter=%p\n", __cyg_profile_func_enter);
     wa_debug ("  __cyg_profile_func_exit=%p\n", __cyg_profile_func_exit);
+#endif
 
     wa_debug ("  malloc=%p\n", malloc);
     wa_debug ("  calloc=%p\n", calloc);
@@ -1304,12 +1307,18 @@ wa_abort (void)
     switch (wa_segv_details.action) {
 
     case WA_SEGV_RAISE_SIGNAL:
-        wa_msg ("caught SIGSEGV - raising signal %d (%s)\n",
-                (int)wa_segv_details.value,
-                wa_signal_num_to_name (wa_segv_details.value));
-        fflush (NULL);
+        {
+            const char *name;
+           
+            name = wa_signal_num_to_name (wa_segv_details.value);
 
-        raise (wa_segv_details.value);
+            wa_msg ("caught SIGSEGV - raising signal %d (%s)\n",
+                    (int)wa_segv_details.value,
+                    name ? name : "<<UNKNOWN>>");
+            fflush (NULL);
+
+            raise (wa_segv_details.value);
+        }
         break;
 
     case WA_SEGV_EXIT:

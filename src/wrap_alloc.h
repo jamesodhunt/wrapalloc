@@ -81,8 +81,12 @@ typedef unsigned char bool;
  */
 typedef struct memory_ctl_block
 {
+    /* Required to be first member of structure by WMList */
     WMList entry;
 
+    /* This would of course normally be the first structure member
+     * (but for entry :-)
+     */
     char eye_catcher[WA_EYE_CATCHER_LEN];
 
     /* Address of beginning margin

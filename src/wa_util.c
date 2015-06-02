@@ -43,8 +43,6 @@
 
 extern int wa_debug_value;
 
-static int wa_have_performed_setup = FALSE;
-
 WA_PRIVATE char wa_hexmap[] = "0123456789abcdef";
 
 struct wa_signal_map wa_signal_map[] = {
@@ -103,13 +101,8 @@ struct wa_signal_map wa_signal_map[] = {
     { 0, NULL }
 };
 
-static void
-wa_perform_setup (void)
-{
-    wa_assert (! wa_have_performed_setup);
-}
-
 WA_PRIVATE void
+__attribute__((__noreturn__))
 wa_assert_fail (const char *file,
         int line,
         const char *function,
@@ -152,10 +145,6 @@ _wa_log_msg (const char *file,
 
     pid  = getpid ();
     ppid = getppid ();
-
-    if (! wa_have_performed_setup) {
-        wa_perform_setup ();
-    }
 
     logfile = getenv (WRAP_ALLOC_LOGFILE_ENV);
 
@@ -300,18 +289,19 @@ wa_get_memory (size_t size)
     return v;
 }
 
-/*!
+/**
  * Convert arbitrary data into printable format.
  *
- * \param bytes Number of Bytes to consider.
- * \param data Data to consider.
- * \param buffer Buffer to write printable characters to.
- * \return Number of characters written to buffer.
+ * @bytes Number of Bytes to consider.
+ * @data Data to consider.
+ * @buffer Buffer to write printable characters to.
  *
- * \note buffer must be atleast as large as 'data' (ie atleast
+ * Returns: Number of characters written to buffer.
+ *
+ * @note buffer must be atleast as large as 'data' (ie atleast
  * 'bytes'+1 bytes long).
  *
- * \warning It is the callers responsibility to ensure buffer is large
+ * @warn It is the callers responsibility to ensure buffer is large
  * enough.
  */
 WA_PRIVATE int
@@ -481,6 +471,12 @@ error:
     fprintf (stderr, "ERROR: failed to convert bytes to hex\n");
 }
 
+/**
+ * wa_signal_num_to_name:
+ *
+ * Convert the specified signal number into the corresponding full signal
+ * name ("SIGxxx").
+ **/
 WA_PRIVATE const char *
 wa_signal_num_to_name (int signum)
 {
@@ -496,6 +492,12 @@ wa_signal_num_to_name (int signum)
     return NULL;
 }
 
+/**
+ * wa_signal_name_to_num:
+ *
+ * Convert the specified signal name into the corresponding signal
+ * number. Names can be of the form "SIGxxx" or simply "xxx".
+ **/
 WA_PRIVATE int
 wa_signal_name_to_num (const char *signame)
 {
@@ -512,4 +514,3 @@ wa_signal_name_to_num (const char *signame)
 
     return -1;
 }
-

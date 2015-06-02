@@ -57,12 +57,17 @@ wa_signal_handler (int signum);
 WA_PRIVATE void
 wa_setup_signals (void);
 
-/* assert(3) can call malloc(3), so we have to do the job ourselves */
+/* assert(3) can call malloc(3), so we have to do the job ourselves.
+ *
+ * XXX: Note the __no_return__ attribute to keep scan-build from
+ * claiming code could deref a NULL Pointer after a call to wa_assert().
+ */
 WA_PRIVATE void
 wa_assert_fail (const char *file,
         int line,
         const char *function,
-        const char *expr);
+        const char *expr)
+    __attribute__((__noreturn__));
 
 WA_PRIVATE void
 _wa_log_msg (const char *file,

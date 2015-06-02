@@ -145,4 +145,3 @@ wa_list_foreach (const WMList *list, size_t *len,
 
     return 0;
 }
-
