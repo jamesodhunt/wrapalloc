@@ -8,7 +8,7 @@ compiler:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y autopoint
-script: ./reconf && ./configure && make -j4
+script: autoreconf -fi && ./configure && make -j4
 notifications:
   email:
     recipients:
