@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------
  * wrapalloc - check unit test program (see http://check.sourceforge.net/).
  *
- * Copyright (C) 2012-2015 James Hunt <james.hunt@ubuntu.com>.
+ * Copyright (C) 2012-2015 James Hunt <jamesodhunt@ubuntu.com>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
