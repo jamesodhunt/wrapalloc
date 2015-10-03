@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 #---------------------------------------------------------------------
 # Script to run a test program in an LD_PRELOAD
 # environment which loads libwrapalloc.
