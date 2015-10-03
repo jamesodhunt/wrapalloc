@@ -28,6 +28,7 @@ AC_PROG_INSTALL
 AM_PROG_AR
 AC_PROG_LIBTOOL
 
+# Look for C unit test framework (http://check.sourceforge.net/).
 AM_PATH_CHECK
 
 #---------------------------------------------------------------------
