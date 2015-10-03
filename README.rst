@@ -1,3 +1,16 @@
+.. image:: https://travis-ci.org/jamesodhunt/wrapalloc.svg?branch=master
+   :target: https://travis-ci.org/jamesodhunt/wrapalloc
+
+.. image:: https://scan.coverity.com/projects/5310/badge.svg
+   :target: https://scan.coverity.com/projects/wrapalloc
+   :alt: Coverity Scan Build Status
+
+.. image:: https://img.shields.io/badge/license-GPL-3.0.svg
+
+.. image:: https://img.shields.io/badge/donate-flattr-red.svg
+   :alt: Donate via flattr
+   :target: https://flattr.com/profile/jamesodhunt
+
 =========
 wrapalloc
 =========
