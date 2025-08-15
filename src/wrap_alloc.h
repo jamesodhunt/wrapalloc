@@ -172,7 +172,7 @@ static struct statistics {
     size_t total_request_bytes_allocated;
     size_t total_bytes_allocated;
     size_t total_bytes_freed;
-} wa_stats;
+};
 
 typedef struct address
 {

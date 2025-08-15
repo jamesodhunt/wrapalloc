@@ -3,12 +3,6 @@
 
 AC_PREREQ([2.69])
 AC_INIT([wrapalloc], [0.1], [jamesodhunt@ubuntu.com])
-AC_CONFIG_FILES([Makefile
-                 src/Makefile
-                 src/Makefile.am
-                 src/wrapalloc-0.1.pc
-                 tests/Makefile
-                 ])
 AC_CONFIG_SRCDIR([src/wrap_alloc.c])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])
@@ -57,6 +51,13 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([clock_gettime getpagesize mmap memset munmap strdup strstr strtol alloca])
 
 #---------------------------------------------------------------------
+
+AC_CONFIG_FILES([Makefile
+                 src/Makefile
+                 src/Makefile.am
+                 src/wrapalloc-0.1.pc
+                 tests/Makefile
+                 ])
 
 AC_OUTPUT
 

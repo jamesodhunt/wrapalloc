@@ -76,6 +76,14 @@ static WMList *wa_mcb_list = NULL;
  **/
 static WMList *wa_address_list = NULL;
 
+/**
+ * wa_stats:
+ *
+ * Statistics structure.
+ *
+ **/
+static struct statistics wa_stats;
+
 /********************************************************************/
 /* prototypes */
 

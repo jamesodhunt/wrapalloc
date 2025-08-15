@@ -89,7 +89,9 @@ struct wa_signal_map wa_signal_map[] = {
     wa_signal_map_entry (SIGSYS),
 
 #ifdef linux
-    wa_signal_map_entry (SIGUNUSED),
+    #ifdef SIGUNUSED
+        wa_signal_map_entry (SIGUNUSED),
+    #endif /* SIGUNUSED */
 #endif
     wa_signal_map_entry (SIGURG),
     wa_signal_map_entry (SIGVTALRM),
