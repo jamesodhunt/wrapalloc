@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([wrapalloc], [0.1], [jamesodhunt@ubuntu.com])
+AC_INIT([wrapalloc], [0.1], [jamesodhunt@gmail.com])
 AC_CONFIG_SRCDIR([src/wrap_alloc.c])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])

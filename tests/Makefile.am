@@ -6,8 +6,6 @@ TESTS = \
 
 check_PROGRAMS = check_wrapalloc test_wrapalloc
 
-#j_check_LTLIBRARIES = $(top_srcdir)/src/libwrapalloc.la
-
 check_SCRIPTS = test_wrapalloc.sh$(EXEEXT)
 CLEANFILES = $(check_SCRIPTS)
 

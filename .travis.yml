@@ -12,4 +12,4 @@ script: autoreconf -fi && ./configure && make -j4
 notifications:
   email:
     recipients:
-      - jamesodhunt@ubuntu.com
+      - jamesodhunt@gmail.com
