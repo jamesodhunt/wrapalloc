@@ -150,7 +150,7 @@ struct wa_segv_action_details
     long int            value;
 };
 
-static struct statistics {
+struct statistics {
     size_t malloc_calls;
     size_t calloc_calls;
     size_t realloc_calls;
