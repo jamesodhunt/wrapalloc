@@ -38,4 +38,5 @@ jobs:
           make CC=${{ matrix.compiler }} -j$(nproc)
 
       - name: Test (${{ matrix.compiler }} binary)
+        run: |
           make check
