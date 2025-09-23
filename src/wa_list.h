@@ -25,26 +25,42 @@
 
 #include <wa_util.h>
 
-typedef struct wa_list {
-    struct wa_list *prev, *next;
+typedef struct wa_list
+{
+    struct wa_list *prev;
+    struct wa_list *next;
 } WMList;
 
-#define WA_LIST_FOREACH(list, iter)                                    \
+#define WA_LIST_FOREACH(list, iter) \
     for (WMList *iter = (list)->next; iter != (list); iter = iter->next)
 
-#define WA_LIST_EMPTY(list) (((list)->prev == (list))          \
-        && ((list)->next) == (list))
+#define WA_LIST_EMPTY(list) \
+    (((list)->prev == (list)) && ((list)->next) == (list))
 
+typedef int (*WMListHandler)(WMList *entry, void *data);
 
-typedef int (*WMListHandler) (WMList *entry, void *data);
+WMList *
+wa_list_new(void);
 
-WMList * wa_list_new (void);
-void     wa_list_init (WMList *entry);
-WMList * wa_list_add (WMList *list, WMList *entry);
-WMList * wa_list_add_after (WMList *list, WMList *entry);
-WMList * wa_list_remove (WMList *entry);
-int      wa_list_destroy (WMList *entry);
-int      wa_list_foreach(const WMList *list,
-         size_t *len, WMListHandler handler, void *data);
+void
+wa_list_init(WMList *entry);
+
+WMList *
+wa_list_add(WMList *list, WMList *entry);
+
+WMList *
+wa_list_add_after(WMList *list, WMList *entry);
+
+WMList *
+wa_list_remove(WMList *entry);
+
+int
+wa_list_destroy(WMList *entry);
+
+int
+wa_list_foreach(const WMList *list,
+                size_t *len,
+                WMListHandler handler,
+                void *data);
 
 #endif /* _WM_LIST */

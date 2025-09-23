@@ -20,38 +20,39 @@
 
 #include <wa_list.h>
 
-static inline WMList *wa_list_cut (WMList *entry);
+static inline WMList *
+wa_list_cut(WMList *entry);
 
 WMList *
-wa_list_new (void)
+wa_list_new(void)
 {
     WMList *list;
 
-    list = (WMList *)wa_get_memory (sizeof (WMList));
-    if (! list)
+    list = (WMList *)wa_get_memory(sizeof(WMList));
+    if (!list) {
         return NULL;
+    }
 
-    wa_list_init (list);
+    wa_list_init(list);
 
     return list;
 }
 
 void
-wa_list_init (WMList *entry)
+wa_list_init(WMList *entry)
 {
-    wa_assert (entry);
+    wa_assert(entry);
 
     entry->prev = entry->next = entry;
 }
 
 WMList *
-wa_list_add (WMList *list,
-        WMList *entry)
+wa_list_add(WMList *list, WMList *entry)
 {
-    wa_assert (list);
-    wa_assert (entry);
+    wa_assert(list);
+    wa_assert(entry);
 
-    wa_list_cut (entry);
+    wa_list_cut(entry);
 
     entry->prev = list->prev;
     list->prev->next = entry;
@@ -62,13 +63,12 @@ wa_list_add (WMList *list,
 }
 
 WMList *
-wa_list_add_after (WMList *list,
-        WMList *entry)
+wa_list_add_after(WMList *list, WMList *entry)
 {
-    wa_assert (list);
-    wa_assert (entry);
+    wa_assert(list);
+    wa_assert(entry);
 
-    wa_list_cut (entry);
+    wa_list_cut(entry);
 
     entry->next = list->next;
     list->next->prev = entry;
@@ -79,9 +79,9 @@ wa_list_add_after (WMList *list,
 }
 
 static inline WMList *
-wa_list_cut (WMList *entry)
+wa_list_cut(WMList *entry)
 {
-    wa_assert (entry);
+    wa_assert(entry);
 
     entry->prev->next = entry->next;
     entry->next->prev = entry->prev;
@@ -90,26 +90,25 @@ wa_list_cut (WMList *entry)
 }
 
 WMList *
-wa_list_remove (WMList *entry)
+wa_list_remove(WMList *entry)
 {
-    wa_assert (entry);
+    wa_assert(entry);
 
-    wa_list_cut (entry);
-    wa_list_init (entry);
+    wa_list_cut(entry);
+    wa_list_init(entry);
 
     return entry;
 }
 
 int
-wa_list_destroy (WMList *entry)
+wa_list_destroy(WMList *entry)
 {
-    wa_assert (entry);
+    wa_assert(entry);
 
-    wa_list_cut (entry);
+    wa_list_cut(entry);
 
     return 0;
 }
-
 
 /**
  * wa_list_foreach:
@@ -126,19 +125,24 @@ wa_list_destroy (WMList *entry)
  * Returns 0 on success, or -1 if handler returns an error.
  **/
 int
-wa_list_foreach (const WMList *list, size_t *len,
-        WMListHandler handler, void *data)
+wa_list_foreach(const WMList *list,
+                size_t *len,
+                WMListHandler handler,
+                void *data)
 {
     int ret;
 
-    wa_assert (list);
+    wa_assert(list);
 
     *len = 0;
 
-    WA_LIST_FOREACH (list, iter) {
+    WA_LIST_FOREACH(list, iter)
+    {
         if (handler) {
-            ret = handler (iter, data);
-            if (!ret) return -1;
+            ret = handler(iter, data);
+            if (!ret) {
+                return -1;
+            }
         }
         ++*len;
     }
