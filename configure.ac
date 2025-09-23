@@ -1,8 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
-AC_INIT([wrapalloc], [0.1], [jamesodhunt@gmail.com])
+AC_PREREQ([2.71])
+AC_INIT([wrapalloc],[0.1],[jamesodhunt@gmail.com])
 AC_CONFIG_SRCDIR([src/wrap_alloc.c])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([m4])
@@ -20,7 +20,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_PROG_CC
 AC_PROG_INSTALL
 AM_PROG_AR
-AC_PROG_LIBTOOL
+LT_INIT
 
 PKG_PROG_PKG_CONFIG
 
