@@ -24,64 +24,93 @@
  * test the LD_PRELOAD handling.
  *--------------------------------------------------------------------
  */
+#include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <errno.h>
 
 #define WORD "hello"
 
 char *program_name;
 
+#define UNDERRUN_BYTE 'U'
+#define OVERRUN_BYTE 'O'
+
 void
-test_wrapalloc (const char *action)
+test_wrapalloc(const char *action)
 {
-    char   *string = WORD;
-    size_t  len;
+    char *string = WORD;
+    size_t len;
+    size_t bytes;
 
-    assert (action);
+    assert(action);
 
-    len = strlen (string);
+    len = strlen(string);
 
-    string = (char *)malloc (len+1);
+    bytes = len + 1;
 
-    if (! string) {
-        fprintf (stderr,
-                "%s:%d: malloc failed - errno=%d\n",
-                __func__, __LINE__, errno);
-        exit (EXIT_FAILURE);
+    printf("INFO: allocating %lu bytes\n", bytes);
+    fflush(NULL);
+
+    string = (char *)malloc(bytes);
+
+    if (!string) {
+        int saved = errno;
+
+        fprintf(stderr,
+                "ERROR: %s:%d: malloc failed: errno: %d ('%s')\n",
+                __func__,
+                __LINE__,
+                saved,
+                strerror(saved));
+
+        exit(EXIT_FAILURE);
     }
 
-    strncpy (string, WORD, len+1);
+    printf("INFO: allocated %lu bytes\n", bytes);
 
-    if (! strcmp (action, "underrun")) {
-        fprintf (stderr, "forcing an underrun\n");
-        *(string-1) = 'U';
-    } else if (! strcmp (action, "overrun")) { 
-        fprintf (stderr, "forcing an overrun\n");
-        *(string + len+1) = 'O';
+    strncpy(string, WORD, len + 1);
+
+    if (!strcmp(action, "underrun")) {
+        printf("INFO: forcing an underrun with byte '%c' (0x%x)\n",
+               UNDERRUN_BYTE,
+               UNDERRUN_BYTE);
+        *(string - 1) = UNDERRUN_BYTE;
+
+    } else if (!strcmp(action, "overrun")) {
+        printf("INFO: forcing an overrun with byte '%c' (0x%x)\n",
+               OVERRUN_BYTE,
+               OVERRUN_BYTE);
+        *(string + len + 1) = OVERRUN_BYTE;
     } else {
-        fprintf (stderr, "No under/over-run requested\n");
+        printf("INFO: No under/over-run requested\n");
     }
 
-    free (string);
+    printf("INFO: freeing %lu bytes\n", bytes);
+    fflush(NULL);
+
+    free(string);
+
+    printf("INFO: freed %lu bytes\n", bytes);
 }
 
-int main (int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
     const char *action;
 
     program_name = argv[0];
 
     if (argc != 2) {
-        fprintf (stderr, "ERROR: usage: %s <underrun|overrun|normal>\n",
+        fprintf(stderr,
+                "ERROR: usage: %s <underrun|overrun|normal>\n",
                 program_name);
-        exit (EXIT_FAILURE);
+        exit(EXIT_FAILURE);
     }
 
     action = argv[1];
-    test_wrapalloc (action);
+    test_wrapalloc(action);
 
-    exit (EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
 }
