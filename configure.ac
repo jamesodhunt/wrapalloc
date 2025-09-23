@@ -22,8 +22,10 @@ AC_PROG_INSTALL
 AM_PROG_AR
 AC_PROG_LIBTOOL
 
+PKG_PROG_PKG_CONFIG
+
 # Look for C unit test framework (http://check.sourceforge.net/).
-AM_PATH_CHECK
+PKG_CHECK_MODULES([CHECK], [check], [HAVE_CHECK=yes], [HAVE_CHECK=no])
 
 #---------------------------------------------------------------------
 # Checks for libraries.
@@ -49,6 +51,10 @@ AC_FUNC_MALLOC
 AC_FUNC_MMAP
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([clock_gettime getpagesize mmap memset munmap strdup strstr strtol alloca])
+
+#---------------------------------------------------------------------
+
+AM_CONDITIONAL([HAVE_CHECK], test "$HAVE_CHECK" = yes)
 
 #---------------------------------------------------------------------
 
