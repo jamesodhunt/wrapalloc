@@ -38,8 +38,8 @@ AM_TESTS_ENVIRONMENT = ulimit -c 0; \
 check_wrapalloc_SOURCES = check_wrapalloc.c
 test_wrapalloc_SOURCES = test_wrapalloc.c
 
-check_wrapalloc_CFLAGS = @CHECK_CFLAGS@
-test_wrapalloc_CFLAGS = @CHECK_CFLAGS@
+check_wrapalloc_CFLAGS = @CHECK_CFLAGS@ -g -O0
+test_wrapalloc_CFLAGS = @CHECK_CFLAGS@ -g -O0
 
 check_wrapalloc_LDFLAGS = $(all_libraries) $(LIBS) -L$(top_srcdir)/src
 test_wrapalloc_LDFLAGS = $(all_libraries) $(LIBS)
