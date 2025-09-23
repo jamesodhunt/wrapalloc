@@ -29,17 +29,18 @@
 #define FALSE (!TRUE)
 #endif
 
-#if (defined WA_MAIN) || defined (WA_TESTS)
+#if (defined WA_MAIN) || defined(WA_TESTS)
 #define WA_PRIVATE /*static*/
-#else /* ! (WA_MAIN | WA_TESTS) */
+#else              /* ! (WA_MAIN | WA_TESTS) */
 #define WA_PRIVATE extern
 #endif /* (WA_MAIN | WA_TESTS) */
 
 /********************************************************************/
 
-struct wa_signal_map {
-    int    signum;
-    char  *signame;
+struct wa_signal_map
+{
+    int signum;
+    char *signame;
 };
 
 extern struct wa_signal_map wa_signal_map[];
@@ -47,15 +48,15 @@ extern struct wa_signal_map wa_signal_map[];
 /********************************************************************/
 /* prototypes */
 
-WA_PRIVATE void *
-__attribute ((malloc, warn_unused_result, no_instrument_function, unused))
-wa_get_memory (size_t size);
+WA_PRIVATE void *__attribute((
+    malloc, warn_unused_result, no_instrument_function, unused))
+wa_get_memory(size_t size);
 
 WA_PRIVATE void
-wa_signal_handler (int signum);
+wa_signal_handler(int signum);
 
 WA_PRIVATE void
-wa_setup_signals (void);
+wa_setup_signals(void);
 
 /* assert(3) can call malloc(3), so we have to do the job ourselves.
  *
@@ -63,42 +64,38 @@ wa_setup_signals (void);
  * claiming code could deref a NULL Pointer after a call to wa_assert().
  */
 WA_PRIVATE void
-wa_assert_fail (const char *file,
-        int line,
-        const char *function,
-        const char *expr)
-    __attribute__((__noreturn__));
+wa_assert_fail(const char *file,
+               int line,
+               const char *function,
+               const char *expr) __attribute__((__noreturn__));
 
 WA_PRIVATE void
-_wa_log_msg (const char *file,
-        int line,
-        const char *func,
-        const char *fmt, ...)
-__attribute ((no_instrument_function));
+_wa_log_msg(const char *file, int line, const char *func, const char *fmt, ...)
+    __attribute((no_instrument_function));
 
 WA_PRIVATE int
-wa_address_valid (void *ptr);
+wa_address_valid(void *ptr);
 
 int
-wa_address_was_valid (void *ptr);
+wa_address_was_valid(void *ptr);
 
 WA_PRIVATE void
-wa_mcb_list_init (void);
+wa_mcb_list_init(void);
 
 WA_PRIVATE void
-wa_address_list_init (void);
+wa_address_list_init(void);
 
 WA_PRIVATE void
-wa_tohex (size_t bytes, const void *data);
+wa_tohex(size_t bytes, const void *data);
 
 WA_PRIVATE int
-wa_show_printable (size_t bytes, const void *data, char *buffer);
+wa_show_printable(size_t bytes, const void *data, char *buffer);
 
 WA_PRIVATE const char *
-wa_signal_num_to_name (int signum);
+wa_signal_num_to_name(int signum);
 
 WA_PRIVATE int
-wa_signal_name_to_num (const char *signame);
+wa_signal_name_to_num(const char *signame);
 
 /**************************************/
 
@@ -115,97 +112,102 @@ WA_PRIVATE void *(*__real_alloca)(size_t size);
 
 #else /* ! USE_LD_PRELOAD */
 
-extern void *__real_malloc (size_t size);
-extern void *__real_calloc (size_t nmemb, size_t size);
-extern void *__real_realloc (void *ptr, size_t size);
-extern void __real_free (void *ptr);
+extern void *
+__real_malloc(size_t size);
+extern void *
+__real_calloc(size_t nmemb, size_t size);
+extern void *
+__real_realloc(void *ptr, size_t size);
+extern void
+__real_free(void *ptr);
 
 #ifdef HAVE_ALLOCA
-extern void *__real_alloca (size_t size);
+extern void *
+__real_alloca(size_t size);
 #endif /* HAVE_ALLOCA */
 
 #endif /* USE_LD_PRELOAD */
 
 /********************************************************************/
 
-#define APP_NAME    "wrap-alloc"
+#define APP_NAME "wrap-alloc"
 #define APP_VERSION "0.1"
 
-#define WA_DELIMITER  "--------------------\n"
+#define WA_DELIMITER "--------------------\n"
 
 /* Value that marks an MemoryCtlBlock */
-#define WA_EYE_CATCHER      "WACTLBK"
+#define WA_EYE_CATCHER "WACTLBK"
 
 /* Length of EYE_CATCHER */
-#define WA_EYE_CATCHER_LEN  (7+1)
+#define WA_EYE_CATCHER_LEN (7 + 1)
 
 /* size of buffer used by logger */
-#define WA_BUFSIZE              1024
-#define WA_LOG_BUFSIZE         WA_BUFSIZE
+#define WA_BUFSIZE 1024
+#define WA_LOG_BUFSIZE WA_BUFSIZE
 
 #define WA_DEFAULT_BUFFER_SIZE 4096
 
 /* Behave like calloc(3) by default */
 #ifndef DEFAULT_FILL_BYTE
-  #define DEFAULT_FILL_BYTE  0x0
+#define DEFAULT_FILL_BYTE 0x0
 #endif
 
 #define DEFAULT_ALLOC_FILL_BYTE DEFAULT_FILL_BYTE
-#define DEFAULT_FREE_FILL_BYTE  DEFAULT_FILL_BYTE
+#define DEFAULT_FREE_FILL_BYTE DEFAULT_FILL_BYTE
 
 /********************************************************************/
 /* environment variables */
 
 /* Enable debug output if set to any value */
-#define WRAP_ALLOC_DEBUG_ENV        "WRAP_ALLOC_DEBUG"
+#define WRAP_ALLOC_DEBUG_ENV "WRAP_ALLOC_DEBUG"
 
 /* Size of border buffer (in bytes) */
-#define WRAP_ALLOC_BORDER_ENV   "WRAP_ALLOC_BORDER"
+#define WRAP_ALLOC_BORDER_ENV "WRAP_ALLOC_BORDER"
 
 /* Size of pre buffer (in bytes).
  *
  * If not specified, uses WRAP_ALLOC_BORDER_ENV, or if that
  * isn't specified, uses the systems page size (atleast 4k).
  */
-#define WRAP_ALLOC_PRE_BORDER_ENV   "WRAP_ALLOC_PRE_BORDER"
+#define WRAP_ALLOC_PRE_BORDER_ENV "WRAP_ALLOC_PRE_BORDER"
 
 /* Size of post buffer (in bytes).
  *
  * If not specified, uses WRAP_ALLOC_BORDER_ENV, or if that
  * isn't specified, uses the systems page size (atleast 4k).
  */
-#define WRAP_ALLOC_POST_BORDER_ENV  "WRAP_ALLOC_POST_BORDER"
+#define WRAP_ALLOC_POST_BORDER_ENV "WRAP_ALLOC_POST_BORDER"
 
 /* Byte value used to fill pre and post buffers */
-#define WRAP_ALLOC_FILL_ENV         "WRAP_ALLOC_FILL"
+#define WRAP_ALLOC_FILL_ENV "WRAP_ALLOC_FILL"
 
 /* Byte value used to fill pre buffers.
  *
  * If not specified, uses WRAP_ALLOC_FILL_ENV, or if that isn't
  * specified, uses DEFAULT_FILL_BYTE.
  */
-#define WRAP_ALLOC_PRE_FILL_ENV     "WRAP_ALLOC_PRE_FILL"
+#define WRAP_ALLOC_PRE_FILL_ENV "WRAP_ALLOC_PRE_FILL"
 
 /* Byte value used to fill post buffers.
  *
  * If not specified, uses WRAP_ALLOC_FILL_ENV, or if that isn't
  * specified, uses DEFAULT_FILL_BYTE.
  */
-#define WRAP_ALLOC_POST_FILL_ENV    "WRAP_ALLOC_POST_FILL"
+#define WRAP_ALLOC_POST_FILL_ENV "WRAP_ALLOC_POST_FILL"
 
 /* Byte value use to fill memory area requested by user.
  * If not specified, value will be DEFAULT_ALLOC_FILL_BYTE.
  */
-#define WRAP_ALLOC_ALLOC_BYTE_ENV   "WRAP_ALLOC_ALLOC_BYTE"
+#define WRAP_ALLOC_ALLOC_BYTE_ENV "WRAP_ALLOC_ALLOC_BYTE"
 
 /* Byte value use to fill memory area requested by user just before
  * memory is passed to free(3).
  * If not specified, value will be DEFAULT_FREE_FILL_BYTE.
  */
-#define WRAP_ALLOC_FREE_BYTE_ENV   "WRAP_ALLOC_FREE_BYTE"
+#define WRAP_ALLOC_FREE_BYTE_ENV "WRAP_ALLOC_FREE_BYTE"
 
 /* If set, never free memory */
-#define WRAP_ALLOC_DISABLE_FREE_ENV  "WRAP_ALLOC_DISABLE_FREE"
+#define WRAP_ALLOC_DISABLE_FREE_ENV "WRAP_ALLOC_DISABLE_FREE"
 
 /* FIXME: we don't seem to display the addresses atm? */
 /* If set, store all addresses in @address_list to aid in debugging */
@@ -226,61 +228,55 @@ extern void *__real_alloca (size_t size);
 /* Convert a "user pointer" as returned by (m|c)alloc to a
  * MemoryCtlBlock.
  */
-#define wa_ptr_to_mcb(ptr) \
-    (MemoryCtlBlock *) \
-    ((byte *)ptr \
-        - (sizeof (MemoryCtlBlock) \
-        + wa_get_border_size (WA_BUFFER_TYPE_PRE)))
+#define wa_ptr_to_mcb(ptr)                                                    \
+    (MemoryCtlBlock *)((byte *)ptr -                                          \
+                       (sizeof(MemoryCtlBlock) +                              \
+                        wa_get_border_size(WA_BUFFER_TYPE_PRE)))
 
-#define wa_mcb_to_pre_border(mcb) \
-    ((byte *)(mcb)->begin)
+#define wa_mcb_to_pre_border(mcb) ((byte *)(mcb)->begin)
 
-#define wa_mcb_to_post_border(mcb) \
-    (((byte *)(mcb)->end) - wa_get_border_size (WA_BUFFER_TYPE_POST))
+#define wa_mcb_to_post_border(mcb)                                            \
+    (((byte *)(mcb)->end) - wa_get_border_size(WA_BUFFER_TYPE_POST))
 
-#define wa_assert(expr) \
-    ((expr)) \
-        ? (void)0 \
-        : wa_assert_fail (__FILE__, __LINE__, __func__, #expr)
+#define wa_assert(expr)                                                       \
+    ((expr)) ? (void)0 : wa_assert_fail(__FILE__, __LINE__, __func__, #expr)
 
 /* Display an informational message */
-#define wa_msg(...) \
-    _wa_log_msg (__FILE__, __LINE__, __func__, "INFO: " __VA_ARGS__)
+#define wa_msg(...)                                                           \
+    _wa_log_msg(__FILE__, __LINE__, __func__, "INFO: " __VA_ARGS__)
 
-#define wa_warn(...) \
-    _wa_log_msg (__FILE__, __LINE__, __func__, "WARNING: " __VA_ARGS__)
+#define wa_warn(...)                                                          \
+    _wa_log_msg(__FILE__, __LINE__, __func__, "WARNING: " __VA_ARGS__)
 
 /* FIXME */
 #if 0
-#define wa_debug(...) \
-    if (wa_debug_value) \
-        _wa_log_msg (__FILE__, __LINE__, __func__, "DEBUG: " __VA_ARGS__)
+#define wa_debug(...)                                                         \
+    if (wa_debug_value)                                                       \
+    _wa_log_msg(__FILE__, __LINE__, __func__, "DEBUG: " __VA_ARGS__)
 #endif
-#define wa_debug(...) \
-    if (getenv (WRAP_ALLOC_DEBUG_ENV)) \
-        _wa_log_msg (__FILE__, __LINE__, __func__, "DEBUG: " __VA_ARGS__)
+#define wa_debug(...)                                                         \
+    if (getenv(WRAP_ALLOC_DEBUG_ENV))                                         \
+    _wa_log_msg(__FILE__, __LINE__, __func__, "DEBUG: " __VA_ARGS__)
 
-#define wa_err(...) \
-    _wa_log_msg (__FILE__, __LINE__, __func__, "ERROR: " __VA_ARGS__)
+#define wa_err(...)                                                           \
+    _wa_log_msg(__FILE__, __LINE__, __func__, "ERROR: " __VA_ARGS__)
 
 /* Return TRUE if sufficient data has been processed to display a line
  * of data.
  *
  * bytes: 0-based byte count.
  */
-#define WA_HAVE_LINE_TO_DISPLAY(bytes) \
-        (((bytes + 1) % WA_BYTES_PER_LINE) == 0)
+#define WA_HAVE_LINE_TO_DISPLAY(bytes) (((bytes + 1) % WA_BYTES_PER_LINE) == 0)
 
 #define WA_BYTES_PER_LINE 16
 
-#define WA_TOHEX_OUTPUT_AND_CLEAR(buffer, p, ret, byte_count) \
-    wa_debug ("%s\n", buffer); \
-    memset (buffer, '\0', WA_BUFSIZE); \
-    ret = byte_count = 0; \
+#define WA_TOHEX_OUTPUT_AND_CLEAR(buffer, p, ret, byte_count)                 \
+    wa_debug("%s\n", buffer);                                                 \
+    memset(buffer, '\0', WA_BUFSIZE);                                         \
+    ret = byte_count = 0;                                                     \
     p = buffer
 
-#define wa_signal_map_entry(s) \
-    {s, #s}
+#define wa_signal_map_entry(s) { s, #s }
 
 /********************************************************************/
 
@@ -291,13 +287,11 @@ extern void *__real_alloca (size_t size);
  * Macro called when instrumenting to ensure we don't trace the wrapper
  * functions created by the linker.
  **/
-#define WA_IGNORE_WRAPPERS() \
-    if (func ==__wrap_malloc   || \
-        func == __wrap_calloc  || \
-        func == __wrap_realloc || \
-        func == __wrap_alloca  || \
-        func == __wrap_free)      \
-            return
+#define WA_IGNORE_WRAPPERS()                                                  \
+    if (func == __wrap_malloc || func == __wrap_calloc ||                     \
+        func == __wrap_realloc || func == __wrap_alloca ||                    \
+        func == __wrap_free)                                                  \
+    return
 #endif /* USE_INSTRUMENT */
 
 #endif /* _WA_UTIL */

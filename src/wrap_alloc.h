@@ -21,17 +21,17 @@
 #ifndef _WRAP_ALLOC_H
 #define _WRAP_ALLOC_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stddef.h>
-#include <string.h>
 #include <ctype.h>
-#include <unistd.h>
-#include <time.h>
 #include <limits.h>
-#include <syslog.h>
-#include <stdarg.h>
 #include <signal.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <syslog.h>
+#include <time.h>
+#include <unistd.h>
 
 #if HAVE_CONFIG_H
 #include <config.h>
@@ -95,14 +95,14 @@ typedef struct memory_ctl_block
     void *begin;
 
     /* Size of pre buffer */
-    //size_t pre_buffer_size;
+    // size_t pre_buffer_size;
 
     /* Address of chunk of memory user has actually asked for */
     void *memory;
 
     /* Size of post buffer */
     /* FIXME: needed ? */
-    //size_t post_buffer_size;
+    // size_t post_buffer_size;
 
     /* Last byte of end margin */
     void *end;
@@ -147,10 +147,11 @@ enum wa_segv_action
 struct wa_segv_action_details
 {
     enum wa_segv_action action;
-    long int            value;
+    long int value;
 };
 
-struct statistics {
+struct statistics
+{
     size_t malloc_calls;
     size_t calloc_calls;
     size_t realloc_calls;

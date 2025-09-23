@@ -21,21 +21,20 @@
 /* For asprintf(3) */
 #define _GNU_SOURCE
 
+#include <assert.h>
+#include <ctype.h>
+#include <fcntl.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <stdarg.h>
 #include <string.h>
 #include <sys/mman.h>
-#include <ctype.h>
-#include <assert.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-#include <wrap_alloc.h>
 #include <wa_util.h>
+#include <wrap_alloc.h>
 
 #if HAVE_CONFIG_H
 #include <config.h>
@@ -47,73 +46,71 @@ WA_PRIVATE char wa_hexmap[] = "0123456789abcdef";
 
 struct wa_signal_map wa_signal_map[] = {
 
-    wa_signal_map_entry (SIGABRT),
-    wa_signal_map_entry (SIGALRM),
-    wa_signal_map_entry (SIGBUS),
+    wa_signal_map_entry(SIGABRT),
+    wa_signal_map_entry(SIGALRM),
+    wa_signal_map_entry(SIGBUS),
 
     { SIGCHLD, "SIGCLD" },
     { SIGCHLD, "SIGCHLD" },
 
-    wa_signal_map_entry (SIGCONT),
-    wa_signal_map_entry (SIGFPE),
-    wa_signal_map_entry (SIGHUP),
-    wa_signal_map_entry (SIGILL),
-    wa_signal_map_entry (SIGINT),
-    wa_signal_map_entry (SIGKILL),
-    wa_signal_map_entry (SIGPIPE),
-    wa_signal_map_entry (SIGQUIT),
-    wa_signal_map_entry (SIGSEGV),
-    wa_signal_map_entry (SIGSTOP),
-    wa_signal_map_entry (SIGTERM),
-    wa_signal_map_entry (SIGTRAP),
-    wa_signal_map_entry (SIGTSTP),
-    wa_signal_map_entry (SIGTTIN),
-    wa_signal_map_entry (SIGTTOU),
-    wa_signal_map_entry (SIGUSR1),
-    wa_signal_map_entry (SIGUSR2),
-    wa_signal_map_entry (SIGIO),
-    wa_signal_map_entry (SIGIOT),
+    wa_signal_map_entry(SIGCONT),
+    wa_signal_map_entry(SIGFPE),
+    wa_signal_map_entry(SIGHUP),
+    wa_signal_map_entry(SIGILL),
+    wa_signal_map_entry(SIGINT),
+    wa_signal_map_entry(SIGKILL),
+    wa_signal_map_entry(SIGPIPE),
+    wa_signal_map_entry(SIGQUIT),
+    wa_signal_map_entry(SIGSEGV),
+    wa_signal_map_entry(SIGSTOP),
+    wa_signal_map_entry(SIGTERM),
+    wa_signal_map_entry(SIGTRAP),
+    wa_signal_map_entry(SIGTSTP),
+    wa_signal_map_entry(SIGTTIN),
+    wa_signal_map_entry(SIGTTOU),
+    wa_signal_map_entry(SIGUSR1),
+    wa_signal_map_entry(SIGUSR2),
+    wa_signal_map_entry(SIGIO),
+    wa_signal_map_entry(SIGIOT),
 
 #ifdef linux
     /* synonym of SIGIO */
-    {SIGPOLL, "SIGPOLL" },
+    { SIGPOLL, "SIGPOLL" },
 #endif
 
-    wa_signal_map_entry (SIGPROF),
+    wa_signal_map_entry(SIGPROF),
 
 #ifdef linux
-    wa_signal_map_entry (SIGPWR),
-    wa_signal_map_entry (SIGSTKFLT),
+    wa_signal_map_entry(SIGPWR),
+    wa_signal_map_entry(SIGSTKFLT),
 #endif
 
-    wa_signal_map_entry (SIGSYS),
+    wa_signal_map_entry(SIGSYS),
 
 #ifdef linux
-    #ifdef SIGUNUSED
-        wa_signal_map_entry (SIGUNUSED),
-    #endif /* SIGUNUSED */
+#ifdef SIGUNUSED
+    wa_signal_map_entry(SIGUNUSED),
+#endif /* SIGUNUSED */
 #endif
-    wa_signal_map_entry (SIGURG),
-    wa_signal_map_entry (SIGVTALRM),
-    wa_signal_map_entry (SIGWINCH),
-    wa_signal_map_entry (SIGXCPU),
-    wa_signal_map_entry (SIGXFSZ),
+    wa_signal_map_entry(SIGURG),
+    wa_signal_map_entry(SIGVTALRM),
+    wa_signal_map_entry(SIGWINCH),
+    wa_signal_map_entry(SIGXCPU),
+    wa_signal_map_entry(SIGXFSZ),
 
     /* terminator */
     { 0, NULL }
 };
 
-WA_PRIVATE void
-__attribute__((__noreturn__))
-wa_assert_fail (const char *file,
-        int line,
-        const char *function,
-        const char *expr)
+WA_PRIVATE void __attribute__((__noreturn__))
+wa_assert_fail(const char *file,
+               int line,
+               const char *function,
+               const char *expr)
 {
-    wa_err ("Assertion failure: %s:%d:%s:%s\n",
-            file, line, function, expr);
+    wa_err("Assertion failure: %s:%d:%s:%s\n", file, line, function, expr);
 
-    abort ();
+    abort();
 }
 
 /**
@@ -130,27 +127,24 @@ wa_assert_fail (const char *file,
  * Calls abort(3) on (internal/ENOMEM) error.
  */
 void WA_PRIVATE
-_wa_log_msg (const char *file,
-        int line,
-        const char *func,
-        const char *fmt, ...)
+_wa_log_msg(const char *file, int line, const char *func, const char *fmt, ...)
 {
-    char     buffer[WA_LOG_BUFSIZE];
-    char    *p = buffer;
-    char    *logfile = NULL;
-    va_list  ap;
-    pid_t    pid;
-    pid_t    ppid;
-    int      ret = 0;
-    size_t   len = 0;
-    int      fd = STDERR_FILENO;
+    char buffer[WA_LOG_BUFSIZE];
+    char *p = buffer;
+    char *logfile = NULL;
+    va_list ap;
+    pid_t pid;
+    pid_t ppid;
+    int ret = 0;
+    size_t len = 0;
+    int fd = STDERR_FILENO;
 
-    pid  = getpid ();
-    ppid = getppid ();
+    pid = getpid();
+    ppid = getppid();
 
-    logfile = getenv (WRAP_ALLOC_LOGFILE_ENV);
+    logfile = getenv(WRAP_ALLOC_LOGFILE_ENV);
 
-    if (! logfile) {
+    if (!logfile) {
         /* No logfile specified, so unable to continue. We require a
          * logfile since at unload time (when wa_finish() gets called),
          * the _CALLER_ *may* have closed stdout/stderr, so we cannot
@@ -159,36 +153,41 @@ _wa_log_msg (const char *file,
         return;
     }
 
-    fd = open (logfile, (O_CREAT|O_APPEND|O_WRONLY), 0640);
+    fd = open(logfile, (O_CREAT | O_APPEND | O_WRONLY), 0640);
     if (fd < 0) {
         goto err_open_logfile;
     }
 
     if (wa_debug_value > 1) {
-        ret = snprintf (p,
-                sizeof (buffer)-len,
-                "%s:pid=%d:ppid=%d:file=%s:line=%d:func=%s:",
-                APP_NAME, pid, ppid, file, line, func);
-        if (ret < 0)
+        ret = snprintf(p,
+                       sizeof(buffer) - len,
+                       "%s:pid=%d:ppid=%d:file=%s:line=%d:func=%s:",
+                       APP_NAME,
+                       pid,
+                       ppid,
+                       file,
+                       line,
+                       func);
+        if (ret < 0) {
             goto err;
+        }
         len += ret;
         p += len;
     }
 
-    va_start (ap, fmt);
+    va_start(ap, fmt);
 
-    ret = vsnprintf (p,
-            sizeof (buffer)-len,
-            fmt, ap);
-    if (ret < 0)
+    ret = vsnprintf(p, sizeof(buffer) - len, fmt, ap);
+    if (ret < 0) {
         goto err;
+    }
     len += ret;
 
-    va_end (ap);
+    va_end(ap);
 
-    assert (len < sizeof (buffer));
+    assert(len < sizeof(buffer));
 
-    if (write (fd, buffer, len) < 0) {
+    if (write(fd, buffer, len) < 0) {
         if (errno == EBADF) {
             /* the caller closed stderr */
             goto out;
@@ -197,20 +196,24 @@ _wa_log_msg (const char *file,
     }
 
 out:
-    close (fd);
+    close(fd);
 
     return;
 
 err:
     len = 0;
-    len = snprintf (buffer,
-            sizeof (buffer)-len,
-            "ERROR: pid=%d, ppid=%d:file=%s:line=%d:func=%s: "
-            "failed to prepare buffer (fmt=\"%s\")\n",
-            pid, ppid, file, line, func,
-            fmt);
+    len = snprintf(buffer,
+                   sizeof(buffer) - len,
+                   "ERROR: pid=%d, ppid=%d:file=%s:line=%d:func=%s: "
+                   "failed to prepare buffer (fmt=\"%s\")\n",
+                   pid,
+                   ppid,
+                   file,
+                   line,
+                   func,
+                   fmt);
 
-    if (write (STDERR_FILENO, buffer, len) < 0) {
+    if (write(STDERR_FILENO, buffer, len) < 0) {
         if (errno == EBADF) {
             /* the caller closed stderr */
             return;
@@ -218,18 +221,24 @@ err:
         goto oh_dear;
     }
 
-    abort ();
+    abort();
 
 err_open_logfile:
     len = 0;
-    len = snprintf (buffer,
-            sizeof (buffer)-len,
-            "ERROR: pid=%d, ppid=%d:file=%s:line=%d:func=%s: "
-            "failed to open logfile %s (errno=%d [%s])\n",
-            pid, ppid, file, line, func,
-            logfile, errno, strerror (errno));
+    len = snprintf(buffer,
+                   sizeof(buffer) - len,
+                   "ERROR: pid=%d, ppid=%d:file=%s:line=%d:func=%s: "
+                   "failed to open logfile %s (errno=%d [%s])\n",
+                   pid,
+                   ppid,
+                   file,
+                   line,
+                   func,
+                   logfile,
+                   errno,
+                   strerror(errno));
 
-    if (write (STDERR_FILENO, buffer, len) < 0) {
+    if (write(STDERR_FILENO, buffer, len) < 0) {
         if (errno == EBADF) {
             /* the caller closed stderr */
             return;
@@ -237,12 +246,13 @@ err_open_logfile:
         goto oh_dear;
     }
 
-    abort ();
+    abort();
 
 oh_dear:
-    fprintf (stderr, "ERROR: write of length %lu failed\n",
+    fprintf(stderr,
+            "ERROR: write of length %lu failed\n",
             (unsigned long int)len);
-    abort ();
+    abort();
 }
 
 /**
@@ -254,37 +264,41 @@ oh_dear:
  *
  * Returns memory block of size @size bytes, or NULL on error.
  **/
-WA_PRIVATE void *
-__attribute ((malloc, warn_unused_result, no_instrument_function))
-wa_get_memory (size_t size)
+WA_PRIVATE void *__attribute((malloc,
+                              warn_unused_result,
+                              no_instrument_function))
+wa_get_memory(size_t size)
 {
     void *v = NULL;
 
-    if (! size)
+    if (!size) {
         return NULL;
+    }
 
 #ifdef HAVE_MMAP
-    v = mmap (NULL,
-            size,
-            PROT_READ|PROT_WRITE,   
-            MAP_ANON|MAP_PRIVATE,
-            -1, 0);
+    v = mmap(NULL,
+             size,
+             PROT_READ | PROT_WRITE,
+             MAP_ANON | MAP_PRIVATE,
+             -1,
+             0);
 
     if (v == MAP_FAILED) {
-        wa_debug ("%s: memory allocation failed (requested size=%lu, size=%lu",
-                __func__,
-                (unsigned long int)size,
-                (unsigned long int)size);
+        wa_debug("%s: memory allocation failed (requested size=%lu, size=%lu",
+                 __func__,
+                 (unsigned long int)size,
+                 (unsigned long int)size);
         return NULL;
     }
 
 #elif USE_LD_PRELOAD
 
-#error "ERROR: need mmap as cannot call real mem routines in LD_PRELOAD environment."
+#error                                                                        \
+    "ERROR: need mmap as cannot call real mem routines in LD_PRELOAD environment."
 
 #else /* linker-trick mode */
 
-    v = __real_calloc (1, size);
+    v = __real_calloc(1, size);
 
 #endif
 
@@ -307,23 +321,22 @@ wa_get_memory (size_t size)
  * enough.
  */
 WA_PRIVATE int
-wa_show_printable (size_t       bytes,
-                   const void  *data,
-                   char        *buffer) {
+wa_show_printable(size_t bytes, const void *data, char *buffer)
+{
     char *b = buffer;
     const byte *p = (const byte *)data;
     size_t total = 0;
 
-    assert (buffer);
+    assert(buffer);
 
     if (bytes == 0 || !data) {
         return 0;
     }
 
     while (bytes) {
-        if (isspace (*p)) {
+        if (isspace(*p)) {
             *b = ' ';
-        } else if (isprint (*p)) {
+        } else if (isprint(*p)) {
             *b = *p;
         } else {
             *b = '.';
@@ -345,68 +358,70 @@ wa_show_printable (size_t       bytes,
  * scenario.
  */
 WA_PRIVATE void
-wa_tohex (size_t count, const void *data)
+wa_tohex(size_t count, const void *data)
 {
-    char         buffer[WA_BUFSIZE];
-    char        *p;
-    const byte  *bytes;
-    size_t       byte_count = 0;
-    size_t       i;
-    int          ret;
+    char buffer[WA_BUFSIZE];
+    char *p;
+    const byte *bytes;
+    size_t byte_count = 0;
+    size_t i;
+    int ret;
 
-    int          blanks = 0;
+    int blanks = 0;
 
-    wa_assert (count);
-    wa_assert (data);
+    wa_assert(count);
+    wa_assert(data);
 
     bytes = (const byte *)data;
     p = buffer;
 
-    memset (buffer, '\0', WA_BUFSIZE);
+    memset(buffer, '\0', WA_BUFSIZE);
 
     /* initial offset */
-    ret = sprintf (p, "%06lx: ", (unsigned long int)0x0);
-    if (ret < 0)
+    ret = sprintf(p, "%06lx: ", (unsigned long int)0x0);
+    if (ret < 0) {
         goto error;
+    }
     p += ret;
     byte_count += ret;
 
     for (i = 0; i < count; i++) {
 
         /* print 2 bytes in hex */
-        *p++ = wa_hexmap[ (((unsigned int) bytes[i]) & 0xF0) >> 4 ];
-        *p++ = wa_hexmap[ (((unsigned int) bytes[i]) & 0x0F) ];
+        *p++ = wa_hexmap[(((unsigned int)bytes[i]) & 0xF0) >> 4];
+        *p++ = wa_hexmap[(((unsigned int)bytes[i]) & 0x0F)];
         byte_count += 2;
 
         /* add spaces between blocks of 2 bytes */
-        ret = sprintf (p, "%s", (((i % 2) == 0) ? "" : " "));
-        if (ret < 0)
+        ret = sprintf(p, "%s", (((i % 2) == 0) ? "" : " "));
+        if (ret < 0) {
             goto error;
+        }
         p += ret;
         byte_count += ret;
 
-        if (WA_HAVE_LINE_TO_DISPLAY (i)) {
+        if (WA_HAVE_LINE_TO_DISPLAY(i)) {
             int indent = i + 1 - WA_BYTES_PER_LINE;
 
             *p++ = ' ';
             byte_count++;
 
             /* display ASCII equivalent after hex string */
-            ret = wa_show_printable (WA_BYTES_PER_LINE, bytes + indent, p);
+            ret = wa_show_printable(WA_BYTES_PER_LINE, bytes + indent, p);
             p += ret;
             byte_count += ret;
 
             WA_TOHEX_OUTPUT_AND_CLEAR(buffer, p, ret, byte_count);
 
             /* header */
-            ret = sprintf (p, "%06lx: ", (unsigned long int) i + 1);
+            ret = sprintf(p, "%06lx: ", (unsigned long int)i + 1);
             p += ret;
             byte_count += ret;
         }
     }
 
-    /* unless the amount of data to display is an exact multiple of BYTES_PER_LINE,
-     * the last line will be shorter than the rest and needs
+    /* unless the amount of data to display is an exact multiple of
+     * BYTES_PER_LINE, the last line will be shorter than the rest and needs
      * space-padding.
      */
     blanks = (WA_BYTES_PER_LINE - (count % WA_BYTES_PER_LINE));
@@ -418,9 +433,10 @@ wa_tohex (size_t count, const void *data)
          * digits (hence the "2*" since each hex digit is represented as 2
          * actual digits).
          */
-        ret = sprintf (p, "%*s", (2 * tmpblanks), " ");
-        if (ret < 0)
+        ret = sprintf(p, "%*s", (2 * tmpblanks), " ");
+        if (ret < 0) {
             goto error;
+        }
 
         p += ret;
         byte_count += ret;
@@ -428,17 +444,19 @@ wa_tohex (size_t count, const void *data)
         /* allow for spaces between each block of 2 hex digits */
         tmpblanks = blanks / 2;
 
-        ret = sprintf (p, "%*s", tmpblanks, " ");
-        if (ret < 0)
+        ret = sprintf(p, "%*s", tmpblanks, " ");
+        if (ret < 0) {
             goto error;
+        }
 
         p += ret;
         byte_count += ret;
 
         /* fine-tuning */
-        ret = sprintf (p, " ");
-        if (ret < 0)
+        ret = sprintf(p, " ");
+        if (ret < 0) {
             goto error;
+        }
 
         p += ret;
         byte_count += ret;
@@ -449,17 +467,18 @@ wa_tohex (size_t count, const void *data)
          * of 2 hex digits no the last line.
          */
         if (blanks % 2) {
-            ret = sprintf (p, " ");
-            if (ret < 0)
+            ret = sprintf(p, " ");
+            if (ret < 0) {
                 goto error;
+            }
             p += ret;
             byte_count += ret;
         }
 
-        ret = wa_show_printable (WA_BYTES_PER_LINE - blanks,
-                                 ((byte *)data) +
-                                 (count - (WA_BYTES_PER_LINE - blanks)),
-                                 p);
+        ret = wa_show_printable(WA_BYTES_PER_LINE - blanks,
+                                ((byte *)data) +
+                                    (count - (WA_BYTES_PER_LINE - blanks)),
+                                p);
         p += ret;
         byte_count += ret;
 
@@ -470,7 +489,7 @@ wa_tohex (size_t count, const void *data)
 
 error:
 
-    fprintf (stderr, "ERROR: failed to convert bytes to hex\n");
+    fprintf(stderr, "ERROR: failed to convert bytes to hex\n");
 }
 
 /**
@@ -480,15 +499,16 @@ error:
  * name ("SIGxxx").
  **/
 WA_PRIVATE const char *
-wa_signal_num_to_name (int signum)
+wa_signal_num_to_name(int signum)
 {
-    assert (signum >= 0);
+    assert(signum >= 0);
 
     struct wa_signal_map *p;
 
     for (p = wa_signal_map; p && p->signame; p++) {
-        if (signum == p->signum)
+        if (signum == p->signum) {
             return p->signame;
+        }
     }
 
     return NULL;
@@ -501,17 +521,18 @@ wa_signal_num_to_name (int signum)
  * number. Names can be of the form "SIGxxx" or simply "xxx".
  **/
 WA_PRIVATE int
-wa_signal_name_to_num (const char *signame)
+wa_signal_name_to_num(const char *signame)
 {
-    assert (signame);
+    assert(signame);
 
     struct wa_signal_map *p;
 
     for (p = wa_signal_map; p && p->signame; p++) {
-        if (! strcmp (signame, p->signame) ||
-                /* +3 to hop over leading 'SIG' */
-                strstr (p->signame, signame) == p->signame+3)
+        if (!strcmp(signame, p->signame) ||
+            /* +3 to hop over leading 'SIG' */
+            strstr(p->signame, signame) == p->signame + 3) {
             return p->signum;
+        }
     }
 
     return -1;
