@@ -31,10 +31,10 @@ typedef struct wa_list
     struct wa_list *next;
 } WMList;
 
-#define WA_LIST_FOREACH(list, iter) \
+#define WA_LIST_FOREACH(list, iter)                                           \
     for (WMList *iter = (list)->next; iter != (list); iter = iter->next)
 
-#define WA_LIST_EMPTY(list) \
+#define WA_LIST_EMPTY(list)                                                   \
     (((list)->prev == (list)) && ((list)->next) == (list))
 
 typedef int (*WMListHandler)(WMList *entry, void *data);
