@@ -130,7 +130,7 @@ __real_alloca(size_t size);
 
 /********************************************************************/
 
-#define APP_NAME "wrap-alloc"
+#define APP_NAME    "wrap-alloc"
 #define APP_VERSION "0.1"
 
 #define WA_DELIMITER "--------------------\n"
@@ -142,7 +142,7 @@ __real_alloca(size_t size);
 #define WA_EYE_CATCHER_LEN (7 + 1)
 
 /* size of buffer used by logger */
-#define WA_BUFSIZE 1024
+#define WA_BUFSIZE     1024
 #define WA_LOG_BUFSIZE WA_BUFSIZE
 
 #define WA_DEFAULT_BUFFER_SIZE 4096
@@ -153,7 +153,7 @@ __real_alloca(size_t size);
 #endif
 
 #define DEFAULT_ALLOC_FILL_BYTE DEFAULT_FILL_BYTE
-#define DEFAULT_FREE_FILL_BYTE DEFAULT_FILL_BYTE
+#define DEFAULT_FREE_FILL_BYTE  DEFAULT_FILL_BYTE
 
 /********************************************************************/
 /* environment variables */

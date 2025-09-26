@@ -1359,42 +1359,43 @@ wa_abort(void)
 
     switch (wa_segv_details.action) {
 
-    case WA_SEGV_RAISE_SIGNAL: {
-        const char *name;
+        case WA_SEGV_RAISE_SIGNAL: {
+            const char *name;
 
-        name = wa_signal_num_to_name(wa_segv_details.value);
+            name = wa_signal_num_to_name(wa_segv_details.value);
 
-        wa_msg("caught SIGSEGV - raising signal %d (%s)\n",
-               (int)wa_segv_details.value,
-               name ? name : "<<UNKNOWN>>");
-        fflush(NULL);
+            wa_msg("caught SIGSEGV - raising signal %d (%s)\n",
+                   (int)wa_segv_details.value,
+                   name ? name : "<<UNKNOWN>>");
+            fflush(NULL);
 
-        raise(wa_segv_details.value);
-    } break;
+            raise(wa_segv_details.value);
+        } break;
 
-    case WA_SEGV_EXIT:
-        wa_msg("caught SIGSEGV - exiting with value %d\n",
-               (int)wa_segv_details.value);
-        fflush(NULL);
+        case WA_SEGV_EXIT:
+            wa_msg("caught SIGSEGV - exiting with value %d\n",
+                   (int)wa_segv_details.value);
+            fflush(NULL);
 
-        exit(wa_segv_details.value);
-        break;
+            exit(wa_segv_details.value);
+            break;
 
-    case WA_SEGV_SLEEP_AND_ABORT:
-        wa_msg("caught SIGSEGV - sleeping for %d seconds before aborting\n",
-               (int)wa_segv_details.value);
-        fflush(NULL);
+        case WA_SEGV_SLEEP_AND_ABORT:
+            wa_msg(
+                "caught SIGSEGV - sleeping for %d seconds before aborting\n",
+                (int)wa_segv_details.value);
+            fflush(NULL);
 
-        sleep(wa_segv_details.value);
+            sleep(wa_segv_details.value);
 
-        abort();
-        break;
+            abort();
+            break;
 
-    default:
-        wa_msg("caught SIGSEGV - aborting\n");
-        fflush(NULL);
+        default:
+            wa_msg("caught SIGSEGV - aborting\n");
+            fflush(NULL);
 
-        abort();
-        break;
+            abort();
+            break;
     }
 }

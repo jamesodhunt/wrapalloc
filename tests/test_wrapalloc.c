@@ -35,7 +35,7 @@
 char *program_name;
 
 #define UNDERRUN_BYTE 'U'
-#define OVERRUN_BYTE 'O'
+#define OVERRUN_BYTE  'O'
 
 void
 test_wrapalloc(const char *action)

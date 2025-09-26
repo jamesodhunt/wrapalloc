@@ -28,8 +28,8 @@
 #include <wrap_alloc.h>
 
 #define WA_TEST_BUFSIZE 1024
-#define KILOBYTE(n) (1024 * (n))
-#define MEGABYTE(n) (1024 * KILOBYTE(n))
+#define KILOBYTE(n)     (1024 * (n))
+#define MEGABYTE(n)     (1024 * KILOBYTE(n))
 
 /* arbitrary value that is also a prime to make life interesting */
 static const int value = 17;
