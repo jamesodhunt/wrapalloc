@@ -42,6 +42,7 @@ jobs:
           make check
 
       - name: View logs
+        if: always()
         run: |
           find . -type f -name "*.log" | while read logfile
           do
