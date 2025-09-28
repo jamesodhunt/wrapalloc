@@ -21,13 +21,7 @@
 #ifndef _WA_UTIL
 #define _WA_UTIL
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE (!TRUE)
-#endif
+#include <stdbool.h>
 
 #if (defined WA_MAIN) || defined(WA_TESTS)
 #define WA_PRIVATE /*static*/
@@ -73,7 +67,7 @@ WA_PRIVATE void
 _wa_log_msg(const char *file, int line, const char *func, const char *fmt, ...)
     __attribute((no_instrument_function));
 
-WA_PRIVATE int
+WA_PRIVATE bool
 wa_address_valid(void *ptr);
 
 WA_PRIVATE void
@@ -258,7 +252,7 @@ __real_alloca(size_t size);
 #define wa_err(...)                                                           \
     _wa_log_msg(__FILE__, __LINE__, __func__, "ERROR: " __VA_ARGS__)
 
-/* Return TRUE if sufficient data has been processed to display a line
+/* Return true if sufficient data has been processed to display a line
  * of data.
  *
  * bytes: 0-based byte count.

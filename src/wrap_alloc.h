@@ -26,6 +26,7 @@
 #include <signal.h>
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -70,7 +71,6 @@
 extern char **environ;
 
 typedef unsigned char byte;
-typedef unsigned char bool;
 
 /**
  * MemoryCtlBlock:
@@ -123,7 +123,7 @@ typedef struct memory_ctl_block
     /* time memory was allocated */
     struct timespec call_time;
 
-    /* TRUE if @memory should be considered as freed */
+    /* true if @memory should be considered as freed */
     bool freed;
 
 } MemoryCtlBlock;

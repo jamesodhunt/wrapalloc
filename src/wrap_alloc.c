@@ -54,9 +54,9 @@ int wa_debug_value = 0;
 /**
  * wa_initialized:
  *
- * Set to TRUE when all setup has been performed.
+ * Set when all setup has been performed.
  **/
-static int wa_initialized = FALSE;
+static bool wa_initialized = false;
 
 /**
  * wa_mcb_list:
@@ -170,7 +170,7 @@ alloca (size_t size)
  *
  * Convert a string representation of a number.
  *
- * Returns: TRUE on success, else FALSE.
+ * Returns: true on success, else false.
  *
  * Accepts numbers in:
  *
@@ -201,10 +201,10 @@ wa_get_number(const char *number, long int *value)
     errno = 0;
     *value = strtol(p, &endptr, base);
     if (errno || *endptr) {
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 /**
@@ -992,7 +992,7 @@ __wa_wrap_free(void *ptr)
     wa_list_remove(&m->entry);
 
     /* Consider the memory as unusable now */
-    m->freed = TRUE;
+    m->freed = true;
 
     if (__wa_free_mem_block(m, m->total_size) != 0) {
         wa_warn("failed to free memory block\n");
@@ -1211,7 +1211,7 @@ wa_init(void)
         wa_setup_signals();
     }
 
-    wa_initialized = TRUE;
+    wa_initialized = true;
 }
 
 static void __attribute__((/*destructor*/, no_instrument_function))
@@ -1263,13 +1263,13 @@ wa_rate_limit(size_t secs)
  * Determine if @ptr refers to a memory address we created (in other
  * words one which has an associated MemoryCtlBlock).
  *
- * Returns: TRUE if @ptr is known, else FALSE.
+ * Returns: true if @ptr is known, else false.
  **/
-int
+bool
 wa_address_valid(void *ptr)
 {
     if (!ptr) {
-        return FALSE;
+        return false;
     }
 
     wa_mcb_list_init();
@@ -1279,11 +1279,11 @@ wa_address_valid(void *ptr)
         MemoryCtlBlock *m = (MemoryCtlBlock *)iter;
 
         if (m->memory == ptr) {
-            return TRUE;
+            return true;
         }
     }
 
-    return FALSE;
+    return false;
 }
 
 // FIXME: signum unused.
