@@ -1359,7 +1359,8 @@ wa_abort(void)
 
     switch (wa_segv_details.action) {
 
-        case WA_SEGV_RAISE_SIGNAL: {
+        case WA_SEGV_RAISE_SIGNAL:
+        {
             const char *name;
 
             name = wa_signal_num_to_name(wa_segv_details.value);
