@@ -29,6 +29,9 @@ die()
 # fail fast
 set -e
 
+# check for unset variables
+set -u
+
 # disable core files
 ulimit -c 0
 
