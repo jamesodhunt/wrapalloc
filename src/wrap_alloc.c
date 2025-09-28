@@ -47,9 +47,9 @@ static void *wa_caller;
 /**
  * wa_debug_value:
  *
- * Set to TRUE if caller wants debug output.
+ * Set if caller wants debug output.
  **/
-int wa_debug_value = FALSE;
+int wa_debug_value = 0;
 
 /**
  * wa_initialized:
