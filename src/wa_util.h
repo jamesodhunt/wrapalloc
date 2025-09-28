@@ -67,9 +67,6 @@ WA_PRIVATE void
 _wa_log_msg(const char *file, int line, const char *func, const char *fmt, ...)
     __attribute((no_instrument_function));
 
-WA_PRIVATE bool
-wa_address_valid(void *ptr);
-
 WA_PRIVATE void
 wa_mcb_list_init(void);
 

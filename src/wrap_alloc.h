@@ -181,4 +181,7 @@ typedef struct address
     void *address;
 } Address;
 
+WA_PRIVATE bool
+wa_address_valid(void *ptr);
+
 #endif /* _WRAP_ALLOC_H */
