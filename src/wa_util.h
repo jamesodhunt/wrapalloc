@@ -76,9 +76,6 @@ _wa_log_msg(const char *file, int line, const char *func, const char *fmt, ...)
 WA_PRIVATE int
 wa_address_valid(void *ptr);
 
-int
-wa_address_was_valid(void *ptr);
-
 WA_PRIVATE void
 wa_mcb_list_init(void);
 

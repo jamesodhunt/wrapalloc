@@ -1286,38 +1286,6 @@ wa_address_valid(void *ptr)
     return FALSE;
 }
 
-// FIXME: unused
-/**
- * wa_address_was_valid:
- *
- * @ptr: Address of user-requested memory to check.
- *
- * Determine if @ptr refers to a memory address that we created but
- * which might now have been freed.
- *
- * Returns: TRUE if @ptr is/was known to us, else FALSE.
- **/
-int
-wa_address_was_valid(void *ptr)
-{
-    if (!ptr) {
-        return FALSE;
-    }
-
-    wa_address_list_init();
-
-    WA_LIST_FOREACH(wa_address_list, iter)
-    {
-        Address *a = (Address *)iter;
-
-        if (a->address == ptr) {
-            return TRUE;
-        }
-    }
-
-    return FALSE;
-}
-
 // FIXME: signum unused.
 void
 wa_signal_handler(int signum)
