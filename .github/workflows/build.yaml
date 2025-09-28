@@ -40,3 +40,12 @@ jobs:
       - name: Test (${{ matrix.compiler }} binary)
         run: |
           make check
+
+      - name: View logs
+        run: |
+          find . -type f -name "*.log" | while read logfile
+          do
+            echo -e "INFO: logfile: '$logfile':\n"
+            cat "$logfile"
+          done
+
